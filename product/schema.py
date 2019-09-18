@@ -6,7 +6,7 @@ import graphene
 from graphene_django import DjangoObjectType
 from graphene_django.filter import DjangoFilterConnectionField
 
-from .models import Product
+from .models import Product, ProductItem
 
 
 class ProductGQLType(DjangoObjectType):
@@ -17,6 +17,26 @@ class ProductGQLType(DjangoObjectType):
             'id': ['exact'],
             'code': ['exact', 'icontains', 'istartswith'],
             'name': ['exact', 'icontains', 'istartswith'],
+        }
+        connection_class = ExtendedConnection
+
+
+class ProductItemGQLType(DjangoObjectType):
+    class Meta:
+        model = ProductItem
+        interfaces = (graphene.relay.Node,)
+        filter_fields = {
+            'id': ['exact'],
+        }
+        connection_class = ExtendedConnection
+
+
+class ProductServiceGQLType(DjangoObjectType):
+    class Meta:
+        model = ProductItem
+        interfaces = (graphene.relay.Node,)
+        filter_fields = {
+            'id': ['exact'],
         }
         connection_class = ExtendedConnection
 
