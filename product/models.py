@@ -5,7 +5,7 @@ from core import fields
 
 class Product(models.Model):
     id = models.AutoField(db_column='ProdID', primary_key=True)
-    uuid = models.UUIDField(db_column='ProdUUID', default=uuid.uuid4, unique = True)
+    uuid = models.CharField(db_column='ProdUUID', max_length=36, default=uuid.uuid4, unique = True)
     code = models.CharField(db_column='ProductCode', max_length=8)
     name = models.CharField(db_column='ProductName', max_length=100)
     # locationid = models.ForeignKey(Tbllocations, models.DO_NOTHING, db_column='LocationId', blank=True, null=True)
