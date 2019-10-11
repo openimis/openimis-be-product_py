@@ -1,5 +1,5 @@
 import re
-
+from django.core.exceptions import PermissionDenied
 from core import ExtendedConnection
 from django.db.models import Q
 import graphene
@@ -7,6 +7,8 @@ from graphene_django import DjangoObjectType
 from graphene_django.filter import DjangoFilterConnectionField
 
 from .models import Product, ProductItem
+from .apps import ProductConfig
+from django.utils.translation import gettext as _
 
 
 class ProductGQLType(DjangoObjectType):
@@ -49,6 +51,8 @@ class Query(graphene.ObjectType):
     )
 
     def resolve_products_str(self, info, **kwargs):
+        if not info.context.user.has_perms(ProductConfig.gql_query_products_perms):
+            raise PermissionDenied(_("unauthorized"))
         str = kwargs.get('str')
         if str is not None:
             return Product.objects.filter(
