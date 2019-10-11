@@ -91,9 +91,10 @@ class Product(models.Model):
     max_amount_antenatal = models.DecimalField(db_column='MaxAmountAntenatal', max_digits=18, decimal_places=2,
                                                blank=True, null=True)
     max_no_antenatal = models.IntegerField(db_column='MaxNoAntenatal', blank=True, null=True)
-    ceiling_interpretation = models.ForeignKey(CeilingInterpretation, models.DO_NOTHING,
-                                               db_column='CeilingInterpretation', blank=True, null=True,
-                                               related_name="products")
+    ceiling_interpretation = models.CharField(max_length=1, db_column='CeilingInterpretation', blank=True, null=True)
+    # ceiling_interpretation = models.ForeignKey(CeilingInterpretation, models.DO_NOTHING,
+    #                                            db_column='CeilingInterpretation', blank=True, null=True,
+    #                                            related_name="products")
     # level1 = models.CharField(db_column='Level1', max_length=1, blank=True, null=True)
     # sublevel1 = models.ForeignKey(Tblhfsublevel, models.DO_NOTHING, db_column='Sublevel1', blank=True, null=True)
     # level2 = models.CharField(db_column='Level2', max_length=1, blank=True, null=True)
@@ -113,6 +114,9 @@ class Product(models.Model):
     class Meta:
         managed = False
         db_table = 'tblProduct'
+
+    CEILING_INTERPRETATION_HOSPITAL = 'H'
+    CEILING_INTERPRETATION_IN_PATIENT = 'I'
 
 
 class ProductItem(models.Model):
