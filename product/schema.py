@@ -50,6 +50,11 @@ class Query(graphene.ObjectType):
         str=graphene.String()
     )
 
+    def resolve_products(self, info, **kwargs):
+        if not info.context.user.has_perms(ProductConfig.gql_query_products_perms):
+            raise PermissionDenied(_("unauthorized"))
+        pass
+
     def resolve_products_str(self, info, **kwargs):
         if not info.context.user.has_perms(ProductConfig.gql_query_products_perms):
             raise PermissionDenied(_("unauthorized"))

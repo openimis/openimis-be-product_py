@@ -141,8 +141,8 @@ class ProductItem(models.Model):
     ceiling_exclusion_child = models.CharField(db_column='CeilingExclusionChild', max_length=1, null=True, blank=True)
     validity_from = fields.DateTimeField(db_column='ValidityFrom')
     validity_to = fields.DateTimeField(db_column='ValidityTo', blank=True, null=True)
-    # legacy_id = models.IntegerField(db_column='LegacyID', blank=True, null=True)
-    # audit_user_id = models.IntegerField(db_column='AuditUserID')
+    legacy_id = models.IntegerField(db_column='LegacyID', blank=True, null=True)
+    audit_user_id = models.IntegerField(db_column='AuditUserID')
     # rowid = models.TextField(db_column='RowID', blank=True, null=True) This field type is a guess.
 
     class Meta:
@@ -173,7 +173,7 @@ class ProductService(models.Model):
     ceiling_exclusion_child = models.CharField(db_column='CeilingExclusionChild', max_length=1, null=True, blank=True)
     validity_from = fields.DateTimeField(db_column='ValidityFrom')
     validity_to = fields.DateTimeField(db_column='ValidityTo', blank=True, null=True)
-    # legacy_id = models.IntegerField(db_column='LegacyID', blank=True, null=True)
+    legacy_id = models.IntegerField(db_column='LegacyID', blank=True, null=True)
     audit_user_id = models.IntegerField(db_column='AuditUserID')
     # rowid = models.TextField(db_column='RowID', blank=True, null=True) This field type is a guess.
 
