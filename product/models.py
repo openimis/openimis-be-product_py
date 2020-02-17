@@ -8,7 +8,7 @@ class Product(models.Model):
     uuid = models.CharField(db_column='ProdUUID', max_length=36, default=uuid.uuid4, unique = True)
     code = models.CharField(db_column='ProductCode', max_length=8)
     name = models.CharField(db_column='ProductName', max_length=100)
-    # locationid = models.ForeignKey(Tbllocations, models.DO_NOTHING, db_column='LocationId', blank=True, null=True)
+    location = models.ForeignKey("location.Location", models.DO_NOTHING, db_column='LocationId', blank=True, null=True)
     # insuranceperiod = models.SmallIntegerField(db_column='InsurancePeriod')
     date_from = models.DateTimeField(db_column='DateFrom')
     date_to = models.DateTimeField(db_column='DateTo')
@@ -118,8 +118,23 @@ class Product(models.Model):
     CEILING_INTERPRETATION_HOSPITAL = 'H'
     CEILING_INTERPRETATION_IN_PATIENT = 'I'
 
+    RELATIVE_PRICE_PERIOD_MONTH = 'M'
+    RELATIVE_PRICE_PERIOD_QUARTER = 'Q'
+    RELATIVE_PRICE_PERIOD_YEAR = 'Y'
 
-class ProductItem(models.Model):
+
+class ProductItemOrService:
+    ORIGIN_PRICELIST = 'P'
+    ORIGIN_CLAIM = 'O'
+    ORIGIN_RELATIVE = 'R'
+    ORIGIN_EMERGENCY = 'E'
+
+    LIMIT_CO_INSURANCE = 'C'
+    LIMIT_FIXED_AMOUNT = 'F'
+    LIMIT_OTHER = 'O'
+
+
+class ProductItem(models.Model, ProductItemOrService):
     id = models.AutoField(db_column='ProdItemID', primary_key=True)
     product = models.ForeignKey(Product, db_column='ProdID', on_delete=models.DO_NOTHING, related_name="items")
     item = models.ForeignKey("medical.Item", db_column='ItemID', on_delete=models.DO_NOTHING, related_name="items")
@@ -150,7 +165,7 @@ class ProductItem(models.Model):
         db_table = 'tblProductItems'
 
 
-class ProductService(models.Model):
+class ProductService(models.Model, ProductItemOrService):
     id = models.AutoField(db_column='ProdServiceID', primary_key=True)
     product = models.ForeignKey(Product, db_column='ProdID', on_delete=models.DO_NOTHING, related_name="products")
     service = models.ForeignKey("medical.Service", db_column='ServiceID', on_delete=models.DO_NOTHING,
@@ -180,12 +195,3 @@ class ProductService(models.Model):
     class Meta:
         managed = False
         db_table = 'tblProductServices'
-
-    LIMIT_CO_INSURANCE = 'C'
-    LIMIT_FIXED_AMOUNT = 'F'
-    LIMIT_OTHER = 'O'
-
-    ORIGIN_PRICELIST = 'P'
-    ORIGIN_CLAIM = 'O'
-    ORIGIN_RELATIVE = 'R'
-    ORIGIN_EMERGENCY = 'E'
