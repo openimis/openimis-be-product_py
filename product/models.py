@@ -1,9 +1,10 @@
 import uuid
 from django.db import models
 from core import fields
+from core import models as core_models
 
 
-class Product(models.Model):
+class Product(core_models.VersionedModel):
     id = models.AutoField(db_column='ProdID', primary_key=True)
     uuid = models.CharField(db_column='ProdUUID', max_length=36, default=uuid.uuid4, unique = True)
     code = models.CharField(db_column='ProductCode', max_length=8)
@@ -41,9 +42,6 @@ class Product(models.Model):
     max_op_policy = models.DecimalField(db_column='MaxOPPolicy', max_digits=18, decimal_places=2, blank=True, null=True)
     max_ip_policy = models.DecimalField(db_column='MaxIPPolicy', max_digits=18, decimal_places=2, blank=True, null=True)
     grace_period = models.IntegerField(db_column='GracePeriod')
-    validity_from = fields.DateTimeField(db_column='ValidityFrom')
-    validity_to = fields.DateTimeField(db_column='ValidityTo', blank=True, null=True)
-    legacy_id = models.IntegerField(db_column='LegacyID', blank=True, null=True)
     audit_user_id = models.IntegerField(db_column='AuditUserID')
     # rowid = models.TextField(db_column='RowID', blank=True, null=True) This field type is a guess.
     # registrationlumpsum = models.DecimalField(db_column='RegistrationLumpSum', max_digits=18, decimal_places=2, blank=True, null=True)
@@ -134,7 +132,7 @@ class ProductItemOrService:
     LIMIT_OTHER = 'O'
 
 
-class ProductItem(models.Model, ProductItemOrService):
+class ProductItem(core_models.VersionedModel, ProductItemOrService):
     id = models.AutoField(db_column='ProdItemID', primary_key=True)
     product = models.ForeignKey(Product, db_column='ProdID', on_delete=models.DO_NOTHING, related_name="items")
     item = models.ForeignKey("medical.Item", db_column='ItemID', on_delete=models.DO_NOTHING, related_name="items")
@@ -154,9 +152,6 @@ class ProductItem(models.Model, ProductItemOrService):
     limit_child_e = models.DecimalField(db_column='LimitChildE', max_digits=18, decimal_places=2, blank=True, null=True)
     ceiling_exclusion_adult = models.CharField(db_column='CeilingExclusionAdult', max_length=1, null=True, blank=True)
     ceiling_exclusion_child = models.CharField(db_column='CeilingExclusionChild', max_length=1, null=True, blank=True)
-    validity_from = fields.DateTimeField(db_column='ValidityFrom')
-    validity_to = fields.DateTimeField(db_column='ValidityTo', blank=True, null=True)
-    legacy_id = models.IntegerField(db_column='LegacyID', blank=True, null=True)
     audit_user_id = models.IntegerField(db_column='AuditUserID')
     # rowid = models.TextField(db_column='RowID', blank=True, null=True) This field type is a guess.
 
@@ -165,7 +160,7 @@ class ProductItem(models.Model, ProductItemOrService):
         db_table = 'tblProductItems'
 
 
-class ProductService(models.Model, ProductItemOrService):
+class ProductService(core_models.VersionedModel, ProductItemOrService):
     id = models.AutoField(db_column='ProdServiceID', primary_key=True)
     product = models.ForeignKey(Product, db_column='ProdID', on_delete=models.DO_NOTHING, related_name="products")
     service = models.ForeignKey("medical.Service", db_column='ServiceID', on_delete=models.DO_NOTHING,
@@ -186,9 +181,6 @@ class ProductService(models.Model, ProductItemOrService):
     limit_child_e = models.DecimalField(db_column='LimitChildE', max_digits=18, decimal_places=2, blank=True, null=True)
     ceiling_exclusion_adult = models.CharField(db_column='CeilingExclusionAdult', max_length=1, null=True, blank=True)
     ceiling_exclusion_child = models.CharField(db_column='CeilingExclusionChild', max_length=1, null=True, blank=True)
-    validity_from = fields.DateTimeField(db_column='ValidityFrom')
-    validity_to = fields.DateTimeField(db_column='ValidityTo', blank=True, null=True)
-    legacy_id = models.IntegerField(db_column='LegacyID', blank=True, null=True)
     audit_user_id = models.IntegerField(db_column='AuditUserID')
     # rowid = models.TextField(db_column='RowID', blank=True, null=True) This field type is a guess.
 
