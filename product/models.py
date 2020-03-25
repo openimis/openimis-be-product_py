@@ -121,6 +121,15 @@ class Product(core_models.VersionedModel):
     RELATIVE_PRICE_PERIOD_YEAR = 'Y'
 
 
+class ProductItemOrServiceManager(models.Manager):
+    def filter(self, *args, **kwargs):
+        keys = [x for x in kwargs if "itemsvc" in x]
+        for key in keys:
+            new_key = key.replace("itemsvc", self.model.model_prefix)
+            kwargs[new_key] = kwargs.pop(key)
+        return super(ProductItemOrServiceManager, self).filter(*args, **kwargs)
+
+
 class ProductItemOrService:
     ORIGIN_PRICELIST = 'P'
     ORIGIN_CLAIM = 'O'
@@ -130,6 +139,11 @@ class ProductItemOrService:
     LIMIT_CO_INSURANCE = 'C'
     LIMIT_FIXED_AMOUNT = 'F'
     LIMIT_OTHER = 'O'
+
+    objects = ProductItemOrServiceManager()
+
+    class Meta:
+        abstract = True
 
 
 class ProductItem(core_models.VersionedModel, ProductItemOrService):
@@ -154,6 +168,8 @@ class ProductItem(core_models.VersionedModel, ProductItemOrService):
     ceiling_exclusion_child = models.CharField(db_column='CeilingExclusionChild', max_length=1, null=True, blank=True)
     audit_user_id = models.IntegerField(db_column='AuditUserID')
     # rowid = models.TextField(db_column='RowID', blank=True, null=True) This field type is a guess.
+    model_prefix = "item"
+    objects = ProductItemOrServiceManager()
 
     class Meta:
         managed = False
@@ -183,6 +199,9 @@ class ProductService(core_models.VersionedModel, ProductItemOrService):
     ceiling_exclusion_child = models.CharField(db_column='CeilingExclusionChild', max_length=1, null=True, blank=True)
     audit_user_id = models.IntegerField(db_column='AuditUserID')
     # rowid = models.TextField(db_column='RowID', blank=True, null=True) This field type is a guess.
+
+    model_prefix = "service"
+    objects = ProductItemOrServiceManager()
 
     class Meta:
         managed = False
