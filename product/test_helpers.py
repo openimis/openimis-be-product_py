@@ -24,7 +24,9 @@ def create_test_product_service(product, service, valid=True, custom_props=None)
         **{
             "product": product,
             "service": service,
-            "limitation_type": ProductService.LIMIT_CO_INSURANCE,
+            "limitation_type": ProductService.LIMIT_CO_INSURANCE,  # mandatory field
+            "limit_adult": 100,  # not mandatory but should be set if limitation_type is
+            "limit_child": 100,  # "
             "price_origin": ProductService.ORIGIN_PRICELIST,
             "validity_from": "2019-06-01",
             "validity_to": None if valid else "2019-06-01",
@@ -35,11 +37,13 @@ def create_test_product_service(product, service, valid=True, custom_props=None)
 
 
 def create_test_product_item(product, item, valid=True, custom_props=None):
-    return ProductService.objects.create(
+    return ProductItem.objects.create(
         **{
             "product": product,
             "item": item,
-            "limitation_type": ProductItem.LIMIT_CO_INSURANCE,
+            "limitation_type": ProductItem.LIMIT_CO_INSURANCE,  # mandatory field
+            "limit_adult": 100,  # not mandatory but should be set if limitation_type is
+            "limit_child": 100,  # "
             "price_origin": ProductItem.ORIGIN_PRICELIST,
             "validity_from": "2019-06-01",
             "validity_to": None if valid else "2019-06-01",
