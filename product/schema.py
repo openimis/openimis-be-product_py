@@ -1,6 +1,7 @@
 import re
 from django.core.exceptions import PermissionDenied
 from core import ExtendedConnection
+from core import filter_validity
 from django.db.models import Q
 import graphene
 from graphene_django import DjangoObjectType
