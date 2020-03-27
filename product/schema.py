@@ -9,7 +9,7 @@ from graphene_django.filter import DjangoFilterConnectionField
 from .models import Product, ProductItem
 from .apps import ProductConfig
 from django.utils.translation import gettext as _
-
+from core import filter_validity
 
 class ProductGQLType(DjangoObjectType):
     class Meta:
