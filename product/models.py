@@ -1,14 +1,15 @@
 import uuid
 from django.db import models
 from core import fields
+from core import models as core_models
 
 
-class Product(models.Model):
+class Product(core_models.VersionedModel):
     id = models.AutoField(db_column='ProdID', primary_key=True)
     uuid = models.CharField(db_column='ProdUUID', max_length=36, default=uuid.uuid4, unique = True)
     code = models.CharField(db_column='ProductCode', max_length=8)
     name = models.CharField(db_column='ProductName', max_length=100)
-    # locationid = models.ForeignKey(Tbllocations, models.DO_NOTHING, db_column='LocationId', blank=True, null=True)
+    location = models.ForeignKey("location.Location", models.DO_NOTHING, db_column='LocationId', blank=True, null=True)
     # insuranceperiod = models.SmallIntegerField(db_column='InsurancePeriod')
     date_from = models.DateTimeField(db_column='DateFrom')
     date_to = models.DateTimeField(db_column='DateTo')
@@ -41,9 +42,6 @@ class Product(models.Model):
     max_op_policy = models.DecimalField(db_column='MaxOPPolicy', max_digits=18, decimal_places=2, blank=True, null=True)
     max_ip_policy = models.DecimalField(db_column='MaxIPPolicy', max_digits=18, decimal_places=2, blank=True, null=True)
     grace_period = models.IntegerField(db_column='GracePeriod')
-    validity_from = fields.DateTimeField(db_column='ValidityFrom')
-    validity_to = fields.DateTimeField(db_column='ValidityTo', blank=True, null=True)
-    legacy_id = models.IntegerField(db_column='LegacyID', blank=True, null=True)
     audit_user_id = models.IntegerField(db_column='AuditUserID')
     # rowid = models.TextField(db_column='RowID', blank=True, null=True) This field type is a guess.
     # registrationlumpsum = models.DecimalField(db_column='RegistrationLumpSum', max_digits=18, decimal_places=2, blank=True, null=True)
@@ -118,8 +116,37 @@ class Product(models.Model):
     CEILING_INTERPRETATION_HOSPITAL = 'H'
     CEILING_INTERPRETATION_IN_PATIENT = 'I'
 
+    RELATIVE_PRICE_PERIOD_MONTH = 'M'
+    RELATIVE_PRICE_PERIOD_QUARTER = 'Q'
+    RELATIVE_PRICE_PERIOD_YEAR = 'Y'
 
-class ProductItem(models.Model):
+
+class ProductItemOrServiceManager(models.Manager):
+    def filter(self, *args, **kwargs):
+        keys = [x for x in kwargs if "itemsvc" in x]
+        for key in keys:
+            new_key = key.replace("itemsvc", self.model.model_prefix)
+            kwargs[new_key] = kwargs.pop(key)
+        return super(ProductItemOrServiceManager, self).filter(*args, **kwargs)
+
+
+class ProductItemOrService:
+    ORIGIN_PRICELIST = 'P'
+    ORIGIN_CLAIM = 'O'
+    ORIGIN_RELATIVE = 'R'
+    ORIGIN_EMERGENCY = 'E'
+
+    LIMIT_CO_INSURANCE = 'C'
+    LIMIT_FIXED_AMOUNT = 'F'
+    LIMIT_OTHER = 'O'
+
+    objects = ProductItemOrServiceManager()
+
+    class Meta:
+        abstract = True
+
+
+class ProductItem(core_models.VersionedModel, ProductItemOrService):
     id = models.AutoField(db_column='ProdItemID', primary_key=True)
     product = models.ForeignKey(Product, db_column='ProdID', on_delete=models.DO_NOTHING, related_name="items")
     item = models.ForeignKey("medical.Item", db_column='ItemID', on_delete=models.DO_NOTHING, related_name="items")
@@ -139,18 +166,17 @@ class ProductItem(models.Model):
     limit_child_e = models.DecimalField(db_column='LimitChildE', max_digits=18, decimal_places=2, blank=True, null=True)
     ceiling_exclusion_adult = models.CharField(db_column='CeilingExclusionAdult', max_length=1, null=True, blank=True)
     ceiling_exclusion_child = models.CharField(db_column='CeilingExclusionChild', max_length=1, null=True, blank=True)
-    validity_from = fields.DateTimeField(db_column='ValidityFrom')
-    validity_to = fields.DateTimeField(db_column='ValidityTo', blank=True, null=True)
-    legacy_id = models.IntegerField(db_column='LegacyID', blank=True, null=True)
     audit_user_id = models.IntegerField(db_column='AuditUserID')
     # rowid = models.TextField(db_column='RowID', blank=True, null=True) This field type is a guess.
+    model_prefix = "item"
+    objects = ProductItemOrServiceManager()
 
     class Meta:
         managed = False
         db_table = 'tblProductItems'
 
 
-class ProductService(models.Model):
+class ProductService(core_models.VersionedModel, ProductItemOrService):
     id = models.AutoField(db_column='ProdServiceID', primary_key=True)
     product = models.ForeignKey(Product, db_column='ProdID', on_delete=models.DO_NOTHING, related_name="products")
     service = models.ForeignKey("medical.Service", db_column='ServiceID', on_delete=models.DO_NOTHING,
@@ -171,21 +197,12 @@ class ProductService(models.Model):
     limit_child_e = models.DecimalField(db_column='LimitChildE', max_digits=18, decimal_places=2, blank=True, null=True)
     ceiling_exclusion_adult = models.CharField(db_column='CeilingExclusionAdult', max_length=1, null=True, blank=True)
     ceiling_exclusion_child = models.CharField(db_column='CeilingExclusionChild', max_length=1, null=True, blank=True)
-    validity_from = fields.DateTimeField(db_column='ValidityFrom')
-    validity_to = fields.DateTimeField(db_column='ValidityTo', blank=True, null=True)
-    legacy_id = models.IntegerField(db_column='LegacyID', blank=True, null=True)
     audit_user_id = models.IntegerField(db_column='AuditUserID')
     # rowid = models.TextField(db_column='RowID', blank=True, null=True) This field type is a guess.
+
+    model_prefix = "service"
+    objects = ProductItemOrServiceManager()
 
     class Meta:
         managed = False
         db_table = 'tblProductServices'
-
-    LIMIT_CO_INSURANCE = 'C'
-    LIMIT_FIXED_AMOUNT = 'F'
-    LIMIT_OTHER = 'O'
-
-    ORIGIN_PRICELIST = 'P'
-    ORIGIN_CLAIM = 'O'
-    ORIGIN_RELATIVE = 'R'
-    ORIGIN_EMERGENCY = 'E'

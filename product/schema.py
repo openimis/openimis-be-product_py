@@ -9,7 +9,7 @@ from graphene_django.filter import DjangoFilterConnectionField
 from .models import Product, ProductItem
 from .apps import ProductConfig
 from django.utils.translation import gettext as _
-
+from core import filter_validity
 
 class ProductGQLType(DjangoObjectType):
     class Meta:
@@ -21,6 +21,10 @@ class ProductGQLType(DjangoObjectType):
             'name': ['exact', 'icontains', 'istartswith'],
         }
         connection_class = ExtendedConnection
+    @classmethod
+    def get_queryset(cls, queryset, info):
+        queryset = queryset.filter(*filter_validity())
+        return queryset
 
 
 class ProductItemGQLType(DjangoObjectType):
