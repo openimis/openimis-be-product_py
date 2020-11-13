@@ -1,6 +1,5 @@
 import uuid
 from django.db import models
-from core import fields
 from core import models as core_models
 
 
@@ -13,7 +12,7 @@ class Product(core_models.VersionedModel):
     # insuranceperiod = models.SmallIntegerField(db_column='InsurancePeriod')
     date_from = models.DateTimeField(db_column='DateFrom')
     date_to = models.DateTimeField(db_column='DateTo')
-    # conversionprodid = models.ForeignKey('self', models.DO_NOTHING, db_column='ConversionProdID', blank=True, null=True)
+    conversion_product = models.ForeignKey('self', models.DO_NOTHING, db_column='ConversionProdID', blank=True, null=True)
     lump_sum = models.DecimalField(db_column='LumpSum', max_digits=18, decimal_places=2)
     member_count = models.SmallIntegerField(db_column='MemberCount')
     premium_adult = models.DecimalField(db_column='PremiumAdult', max_digits=18, decimal_places=2, blank=True, null=True)
@@ -178,6 +177,7 @@ class ProductItem(core_models.VersionedModel, ProductItemOrService):
 
 class ProductService(core_models.VersionedModel, ProductItemOrService):
     id = models.AutoField(db_column='ProdServiceID', primary_key=True)
+    # TODO the related_name should not be products but product_services or services (wrt items)
     product = models.ForeignKey(Product, db_column='ProdID', on_delete=models.DO_NOTHING, related_name="products")
     service = models.ForeignKey("medical.Service", db_column='ServiceID', on_delete=models.DO_NOTHING,
                                 related_name="products")
