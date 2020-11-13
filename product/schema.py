@@ -1,4 +1,3 @@
-import re
 from django.core.exceptions import PermissionDenied
 from core import ExtendedConnection
 from django.db.models import Q
@@ -10,6 +9,7 @@ from .models import Product, ProductItem
 from .apps import ProductConfig
 from django.utils.translation import gettext as _
 from core import filter_validity
+
 
 class ProductGQLType(DjangoObjectType):
     class Meta:
