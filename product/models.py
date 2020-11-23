@@ -9,7 +9,7 @@ class Product(core_models.VersionedModel):
     code = models.CharField(db_column='ProductCode', max_length=8)
     name = models.CharField(db_column='ProductName', max_length=100)
     location = models.ForeignKey("location.Location", models.DO_NOTHING, db_column='LocationId', blank=True, null=True)
-    # insuranceperiod = models.SmallIntegerField(db_column='InsurancePeriod')
+    insurance_period = models.SmallIntegerField(db_column='InsurancePeriod')
     date_from = models.DateTimeField(db_column='DateFrom')
     date_to = models.DateTimeField(db_column='DateTo')
     conversion_product = models.ForeignKey('self', models.DO_NOTHING, db_column='ConversionProdID', blank=True, null=True)
@@ -43,12 +43,14 @@ class Product(core_models.VersionedModel):
     grace_period = models.IntegerField(db_column='GracePeriod')
     audit_user_id = models.IntegerField(db_column='AuditUserID')
     # rowid = models.TextField(db_column='RowID', blank=True, null=True) This field type is a guess.
-    # registrationlumpsum = models.DecimalField(db_column='RegistrationLumpSum', max_digits=18, decimal_places=2, blank=True, null=True)
-    # registrationfee = models.DecimalField(db_column='RegistrationFee', max_digits=18, decimal_places=2, blank=True, null=True)
-    # generalassemblylumpsum = models.DecimalField(db_column='GeneralAssemblyLumpSum', max_digits=18, decimal_places=2, blank=True, null=True)
-    # generalassemblyfee = models.DecimalField(db_column='GeneralAssemblyFee', max_digits=18, decimal_places=2, blank=True, null=True)
-    # startcycle1 = models.CharField(db_column='StartCycle1', max_length=5, blank=True, null=True)
-    # startcycle2 = models.CharField(db_column='StartCycle2', max_length=5, blank=True, null=True)
+    registration_lump_sum = models.DecimalField(db_column='RegistrationLumpSum', max_digits=18, decimal_places=2, blank=True, null=True)
+    registration_fee = models.DecimalField(db_column='RegistrationFee', max_digits=18, decimal_places=2, blank=True, null=True)
+    general_assembly_lump_sum = models.DecimalField(db_column='GeneralAssemblyLumpSum', max_digits=18, decimal_places=2, blank=True, null=True)
+    general_assembly_fee = models.DecimalField(db_column='GeneralAssemblyFee', max_digits=18, decimal_places=2, blank=True, null=True)
+    start_cycle_1 = models.CharField(db_column='StartCycle1', max_length=5, blank=True, null=True)
+    start_cycle_2 = models.CharField(db_column='StartCycle2', max_length=5, blank=True, null=True)
+    start_cycle_3 = models.CharField(db_column='StartCycle3', max_length=5, blank=True, null=True)
+    start_cycle_4 = models.CharField(db_column='StartCycle4', max_length=5, blank=True, null=True)
     max_no_consultation = models.IntegerField(db_column='MaxNoConsultation', blank=True, null=True)
     max_no_surgery = models.IntegerField(db_column='MaxNoSurgery', blank=True, null=True)
     max_no_delivery = models.IntegerField(db_column='MaxNoDelivery', blank=True, null=True)
@@ -68,9 +70,7 @@ class Product(core_models.VersionedModel):
     threshold = models.IntegerField(db_column='Threshold', blank=True, null=True)
     renewal_discount_perc = models.IntegerField(db_column='RenewalDiscountPerc', blank=True, null=True)
     renewal_discount_period = models.IntegerField(db_column='RenewalDiscountPeriod', blank=True, null=True)
-    # startcycle3 = models.CharField(db_column='StartCycle3', max_length=5, blank=True, null=True)
-    # startcycle4 = models.CharField(db_column='StartCycle4', max_length=5, blank=True, null=True)
-    # administrationperiod = models.IntegerField(db_column='AdministrationPeriod', blank=True, null=True)
+    administration_period = models.IntegerField(db_column='AdministrationPeriod', blank=True, null=True)
     max_policy_extra_member = models.DecimalField(db_column='MaxPolicyExtraMember', max_digits=18, decimal_places=2,
                                                   blank=True, null=True)
     max_policy_extra_member_ip = models.DecimalField(db_column='MaxPolicyExtraMemberIP', max_digits=18,
@@ -107,6 +107,15 @@ class Product(core_models.VersionedModel):
     # weightnumberinsuredfamilies = models.DecimalField(db_column='WeightNumberInsuredFamilies', max_digits=5, decimal_places=2, blank=True, null=True)
     # weightnumbervisits = models.DecimalField(db_column='WeightNumberVisits', max_digits=5, decimal_places=2, blank=True, null=True)
     # weightadjustedamount = models.DecimalField(db_column='WeightAdjustedAmount', max_digits=5, decimal_places=2, blank=True, null=True)
+
+    def has_cycle(self):
+        return bool(self.start_cycle_1)
+
+    def has_enrolment_discount(self):
+        return self.enrolment_discount_perc and self.enrolment_discount_period
+
+    def has_renewal_discount(self):
+        return self.renewal_discount_perc and self.renewal_discount_period
 
     class Meta:
         managed = False

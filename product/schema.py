@@ -16,6 +16,7 @@ class ProductGQLType(DjangoObjectType):
         model = Product
         interfaces = (graphene.relay.Node,)
         filter_fields = {
+            'id': ['exact'],
             'uuid': ['exact'],
             'code': ['exact', 'icontains', 'istartswith'],
             'name': ['exact', 'icontains', 'istartswith'],
