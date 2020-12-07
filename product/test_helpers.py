@@ -9,6 +9,7 @@ def create_test_product(code, valid=True, custom_props=None):
             "lump_sum": 123.45,
             "member_count": 1,
             "grace_period": 1,
+            "insurance_period": 12,
             "date_from": "2019-01-01",
             "date_to": "2049-01-01",
             "validity_from": "2019-01-01",

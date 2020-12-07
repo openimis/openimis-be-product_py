@@ -109,7 +109,10 @@ class Product(core_models.VersionedModel):
     # weightadjustedamount = models.DecimalField(db_column='WeightAdjustedAmount', max_digits=5, decimal_places=2, blank=True, null=True)
 
     def has_cycle(self):
-        return bool(self.start_cycle_1)
+        return bool(self.start_cycle_1) \
+               or bool(self.start_cycle_2) \
+               or bool(self.start_cycle_3) \
+               or bool(self.start_cycle_4)
 
     def has_enrolment_discount(self):
         return self.enrolment_discount_perc and self.enrolment_discount_period
