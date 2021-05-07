@@ -1,4 +1,3 @@
-import re
 from django.core.exceptions import PermissionDenied
 from core import ExtendedConnection
 from django.db.models import Q
@@ -11,11 +10,13 @@ from .apps import ProductConfig
 from django.utils.translation import gettext as _
 from core import filter_validity
 
+
 class ProductGQLType(DjangoObjectType):
     class Meta:
         model = Product
         interfaces = (graphene.relay.Node,)
         filter_fields = {
+            'id': ['exact'],
             'uuid': ['exact'],
             'code': ['exact', 'icontains', 'istartswith'],
             'name': ['exact', 'icontains', 'istartswith'],
