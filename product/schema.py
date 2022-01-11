@@ -137,6 +137,11 @@ class ProductGQLType(DjangoObjectType):
 
         return relative_prices
 
+    def resolve_location(self, info):
+      if "location_loader" in info.context.dataloaders and self.location_id:
+          return info.context.dataloaders["location_loader"].load(self.location_id)
+      return self.location
+
     class Meta:
         model = Product
         interfaces = (Node,)

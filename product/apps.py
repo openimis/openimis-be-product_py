@@ -42,3 +42,8 @@ class ProductConfig(AppConfig):
 
         cfg = ModuleConfiguration.get_or_default(MODULE_NAME, DEFAULT_CFG)
         self._configure_permissions(cfg)
+
+    def set_dataloaders(self, dataloaders):
+        from .dataloaders import ProductLoader
+
+        dataloaders["product_loader"] = ProductLoader()
