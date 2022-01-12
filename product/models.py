@@ -427,6 +427,16 @@ class Product(VersionedModel):
     def has_renewal_discount(self):
         return self.renewal_discount_perc and self.renewal_discount_period
 
+    @property
+    def member_count(self):
+        from warnings import warn
+        warn(
+            "'member_count' has been deprecated in favor of 'max_members'",
+            DeprecationWarning,
+            stacklevel=2
+        )
+        return self.max_members
+
     class Meta:
         managed = False
         db_table = "tblProduct"
