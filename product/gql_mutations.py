@@ -77,6 +77,16 @@ def create_or_update_product(user, data):
                 f"'{data[start_cycle_key]}' is not a correct value for product.start_cycle"
             )
 
+    if items:
+        for item in items:
+            if item['limit_adult'] < 0 or item['limit_adult_e'] < 0 or item['limit_adult_r'] < 0:
+                raise ValueError("O,R,E limits must be positive.")
+
+    if services:
+        for service in services:
+            if service['limit_adult'] < 0 or service['limit_adult_e'] < 0 or service['limit_adult_r'] < 0:
+                raise ValueError("O,R,E limits must be positive.")
+
     if data["date_from"] > data["date_to"]:
         raise ValueError("date_from must be before date_to")
 
@@ -301,6 +311,12 @@ class CreateProductMutation(CreateOrUpdateProductMutation):
                 user,
                 **data,
             )
+        except ValueError as exc:
+            return [
+                {
+                    "message": str(exc)
+                }
+            ]
         except Exception as exc:
             return [
                 {
