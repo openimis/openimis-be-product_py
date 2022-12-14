@@ -79,13 +79,23 @@ def create_or_update_product(user, data):
 
     if items:
         for item in items:
-            if item['limit_adult'] < 0 or item['limit_adult_e'] < 0 or item['limit_adult_r'] < 0:
-                raise ValueError("O,R,E limits must be positive.")
+            values = [item['limit_adult'], item['limit_adult_e'], item['limit_adult_r'], item['limit_child'],
+                      item['limit_child_e'], item['limit_child_r']]
+            # checking if value can be interpreted as percentage
+            if not all([True if i >= 0 else False for i in values]):
+                raise ValueError("Item O,R,E limits must be positive.")
+            if not all([True if i <= 100 else False for i in values]):
+                raise ValueError("Item O,R,E limits must smaller or equal to 100.")
 
     if services:
         for service in services:
-            if service['limit_adult'] < 0 or service['limit_adult_e'] < 0 or service['limit_adult_r'] < 0:
-                raise ValueError("O,R,E limits must be positive.")
+            values = [service['limit_adult'], service['limit_adult_e'], service['limit_adult_r'],
+                      service['limit_child'], service['limit_child_e'], service['limit_child_r']]
+            # checking if value can be interpreted as percentage
+            if not all([True if i >= 0 else False for i in values]):
+                raise ValueError("Service O,R,E limits must be positive.")
+            if not all([True if i <= 100 else False for i in values]):
+                raise ValueError("Service O,R,E limits must smaller or equal to 100.")
 
     if data["date_from"] > data["date_to"]:
         raise ValueError("date_from must be before date_to")
