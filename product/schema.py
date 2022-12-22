@@ -29,7 +29,8 @@ from .enums import (
 
 class ProductRelativePricesGQLType(graphene.ObjectType):
     care_type = graphene.Field(CareTypeEnum)
-    periods = graphene.NonNull(graphene.List(graphene.NonNull(graphene.Decimal)))
+    periods = graphene.NonNull(graphene.List(
+        graphene.NonNull(graphene.Decimal)))
 
 
 def period_type_to_number(period_type):
@@ -45,7 +46,8 @@ def period_type_to_number(period_type):
 
 class ProductGQLType(DjangoObjectType):
     ceiling_interpretation = graphene.Field(CeilingInterpretationEnum)
-    relative_prices = graphene.NonNull(graphene.List(ProductRelativePricesGQLType))
+    relative_prices = graphene.NonNull(
+        graphene.List(ProductRelativePricesGQLType))
 
     ceiling_type = graphene.Field(CeilingTypeEnum)
 
@@ -138,9 +140,9 @@ class ProductGQLType(DjangoObjectType):
         return relative_prices
 
     def resolve_location(self, info):
-      if "location_loader" in info.context.dataloaders and self.location_id:
-          return info.context.dataloaders["location_loader"].load(self.location_id)
-      return self.location
+        if "location_loader" in info.context.dataloaders and self.location_id:
+            return info.context.dataloaders["location_loader"].load(self.location_id)
+        return self.location
 
     class Meta:
         model = Product
@@ -245,9 +247,11 @@ class Query(graphene.ObjectType):
         ProductGQLType,
         location=graphene.Int(),
         show_history=graphene.Boolean(),
-        search=graphene.String(description=gettext_lazy("Search in `name` & `code`")),
+        search=graphene.String(description=gettext_lazy(
+            "Search in `name` & `code`")),
     )
-    product = graphene.Field(ProductGQLType, id=graphene.ID(), uuid=graphene.String())
+    product = graphene.Field(
+        ProductGQLType, id=graphene.ID(), uuid=graphene.String())
 
     def resolve_product(self, info, **kwargs):
         if not info.context.user.has_perms(ProductConfig.gql_query_products_perms):
@@ -270,7 +274,8 @@ class Query(graphene.ObjectType):
             qs = qs.filter(*filter_validity(**kwargs))
 
         if search is not None:
-            qs = qs.filter(Q(name__icontains=search) | Q(code__icontains=search))
+            qs = qs.filter(Q(name__icontains=search) |
+                           Q(code__icontains=search))
 
         if location is not None:
             from location.models import Location
@@ -278,6 +283,8 @@ class Query(graphene.ObjectType):
             qs = qs.filter(
                 Q(location__in=Location.objects.parents(location))
                 | Q(location__id=location)
+                | Q(location__isnull=True)
+
             )
 
         return gql_optimizer.query(qs, info)
