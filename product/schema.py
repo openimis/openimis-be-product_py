@@ -200,6 +200,18 @@ class ProductGQLType(DjangoObjectType):
         connection_class = ExtendedConnection
 
 
+class PageDisplayRulesGQLType(graphene.ObjectType):
+    min_limit_value = graphene.Decimal()
+    max_limit_value = graphene.Decimal()
+
+    def resolve_min_limit_value(self, info):
+        return ProductConfig.min_limit_value
+
+    def resolve_max_limit_value(self, info):
+        return ProductConfig.max_limit_value
+
+
+
 class ProductItemGQLType(DjangoObjectType):
     ceiling_exclusion_adult = graphene.Field(CeilingExclusionEnum)
     ceiling_exclusion_child = graphene.Field(CeilingExclusionEnum)
@@ -252,6 +264,12 @@ class Query(graphene.ObjectType):
     )
     product = graphene.Field(
         ProductGQLType, id=graphene.ID(), uuid=graphene.String())
+    page_display_rules = graphene.Field(PageDisplayRulesGQLType)
+
+    def resolve_page_display_rules(self, info):
+        if not info.context.user.has_perms(ProductConfig.gql_query_products_perms):
+            raise PermissionDenied(_("unauthorized"))
+        return PageDisplayRulesGQLType()
 
     def resolve_product(self, info, **kwargs):
         if not info.context.user.has_perms(ProductConfig.gql_query_products_perms):
