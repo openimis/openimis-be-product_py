@@ -1,4 +1,5 @@
 from django.apps import AppConfig
+from decimal import Decimal
 
 MODULE_NAME = "product"
 
@@ -11,6 +12,11 @@ DEFAULT_CFG = {
     "gql_mutation_products_duplicate_perms": ["121005"],
 }
 
+DEFAULT_LIMIT_VALUES = {
+    "min_limit_value": Decimal(0.00),
+    "max_limit_value": Decimal(100.00),
+}
+
 
 class ProductConfig(AppConfig):
     name = MODULE_NAME
@@ -21,6 +27,9 @@ class ProductConfig(AppConfig):
     gql_mutation_products_edit_perms = []
     gql_mutation_products_delete_perms = []
     gql_mutation_products_duplicate_perms = []
+
+    min_limit_value = None
+    max_limit_value = None
 
     def _configure_permissions(self, cfg):
         ProductConfig.gql_query_products_perms = cfg["gql_query_products_perms"]
@@ -37,11 +46,17 @@ class ProductConfig(AppConfig):
             "gql_mutation_products_duplicate_perms"
         ]
 
+    def _configure_limit_values(self, limit_values):
+        ProductConfig.min_limit_value = limit_values['min_limit_value']
+        ProductConfig.max_limit_value = limit_values['max_limit_value']
+
     def ready(self):
         from core.models import ModuleConfiguration
 
         cfg = ModuleConfiguration.get_or_default(MODULE_NAME, DEFAULT_CFG)
+        limit_values = ModuleConfiguration.get_or_default(MODULE_NAME, DEFAULT_LIMIT_VALUES)
         self._configure_permissions(cfg)
+        self._configure_limit_values(limit_values)
 
     def set_dataloaders(self, dataloaders):
         from .dataloaders import ProductLoader
