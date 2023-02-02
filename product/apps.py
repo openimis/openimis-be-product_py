@@ -10,9 +10,6 @@ DEFAULT_CFG = {
     "gql_mutation_products_edit_perms": ["121003"],
     "gql_mutation_products_delete_perms": ["121004"],
     "gql_mutation_products_duplicate_perms": ["121005"],
-}
-
-DEFAULT_LIMIT_VALUES = {
     "min_limit_value": Decimal(0.00),
     "max_limit_value": Decimal(100.00),
 }
@@ -46,17 +43,16 @@ class ProductConfig(AppConfig):
             "gql_mutation_products_duplicate_perms"
         ]
 
-    def _configure_limit_values(self, limit_values):
-        ProductConfig.min_limit_value = limit_values['min_limit_value']
-        ProductConfig.max_limit_value = limit_values['max_limit_value']
+    def _configure_limit_values(self, cfg):
+        ProductConfig.min_limit_value = cfg['min_limit_value']
+        ProductConfig.max_limit_value = cfg['max_limit_value']
 
     def ready(self):
         from core.models import ModuleConfiguration
 
         cfg = ModuleConfiguration.get_or_default(MODULE_NAME, DEFAULT_CFG)
-        limit_values = ModuleConfiguration.get_or_default(MODULE_NAME, DEFAULT_LIMIT_VALUES)
         self._configure_permissions(cfg)
-        self._configure_limit_values(limit_values)
+        self._configure_limit_values(cfg)
 
     def set_dataloaders(self, dataloaders):
         from .dataloaders import ProductLoader
