@@ -1,3 +1,5 @@
+import json
+
 from django.core.exceptions import PermissionDenied
 from core import ExtendedConnection, prefix_filterset
 from django.db.models import Q
@@ -211,6 +213,22 @@ class PageDisplayRulesGQLType(graphene.ObjectType):
         return ProductConfig.max_limit_value
 
 
+class ProductItemOrServiceDefaultValuesGQLType(graphene.ObjectType):
+    default_price_origin = graphene.String()
+    default_limit = graphene.String()
+    default_limit_co_insurance_value = graphene.Int()
+    default_limit_fixed_value = graphene.Int()
+
+    def resolve_default_price_origin(self, info):
+        return ProductConfig.default_price_origin
+    def resolve_default_limit(self, info):
+        return ProductConfig.default_limit
+    def resolve_default_limit_co_insurance_value(self, info):
+        return ProductConfig.default_limit_co_insurance_value
+
+    def resolve_default_limit_fixed_value(self, info):
+        return ProductConfig.default_limit_fixed_value
+
 
 class ProductItemGQLType(DjangoObjectType):
     ceiling_exclusion_adult = graphene.Field(CeilingExclusionEnum)
@@ -265,6 +283,12 @@ class Query(graphene.ObjectType):
     product = graphene.Field(
         ProductGQLType, id=graphene.ID(), uuid=graphene.String())
     page_display_rules = graphene.Field(PageDisplayRulesGQLType)
+    limit_defaults = graphene.Field(ProductItemOrServiceDefaultValuesGQLType)
+
+    def resolve_limit_defaults(self, info):
+        if not info.context.user.has_perms(ProductConfig.gql_query_products_perms):
+            raise PermissionDenied("unauthorized")
+        return ProductItemOrServiceDefaultValuesGQLType()
 
     def resolve_page_display_rules(self, info):
         if not info.context.user.has_perms(ProductConfig.gql_query_products_perms):
