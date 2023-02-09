@@ -1,3 +1,4 @@
+import datetime
 from gettext import gettext as _
 from operator import or_
 from dataclasses import dataclass
@@ -44,7 +45,8 @@ def extract_deductibles(data):
 
 def extract_ceilings(data):
     return DeductibleOrCeilingValue(
-        data.pop("ceiling", 0), data.pop("ceiling_ip", 0), data.pop("ceiling_op", 0)
+        data.pop("ceiling", 0), data.pop(
+            "ceiling_ip", 0), data.pop("ceiling_op", 0)
     )
 
 
@@ -85,7 +87,8 @@ def create_or_update_product(user, data):
             if not all([True if i >= 0 else False for i in values]):
                 raise ValueError("Item O,R,E limits must be positive.")
             if not all([True if i <= 100 else False for i in values]):
-                raise ValueError("Item O,R,E limits must smaller or equal to 100.")
+                raise ValueError(
+                    "Item O,R,E limits must smaller or equal to 100.")
 
     if services:
         for service in services:
@@ -95,7 +98,8 @@ def create_or_update_product(user, data):
             if not all([True if i >= 0 else False for i in values]):
                 raise ValueError("Service O,R,E limits must be positive.")
             if not all([True if i <= 100 else False for i in values]):
-                raise ValueError("Service O,R,E limits must smaller or equal to 100.")
+                raise ValueError(
+                    "Service O,R,E limits must smaller or equal to 100.")
 
     if data["date_from"] > data["date_to"]:
         raise ValueError("date_from must be before date_to")
@@ -112,7 +116,8 @@ def create_or_update_product(user, data):
         product.location = Location.objects.get(uuid=location_uuid)
 
     if conversion_product_uuid is not None:
-        product.conversion_product = Product.objects.get(uuid=conversion_product_uuid)
+        product.conversion_product = Product.objects.get(
+            uuid=conversion_product_uuid)
 
     set_product_relative_distribution(user, product, relative_prices)
 
@@ -126,6 +131,7 @@ def create_or_update_product(user, data):
     if services is not None:
         set_product_services(product, services, user)
 
+    product.validity_from = datetime.datetime.now()
     product.save()
 
     if client_mutation_id:
@@ -136,7 +142,8 @@ def create_or_update_product(user, data):
 
 class RelativePricesInput(graphene.InputObjectType):
     care_type = graphene.Field(CareTypeEnum)
-    periods = graphene.NonNull(graphene.List(graphene.NonNull(graphene.Decimal)))
+    periods = graphene.NonNull(graphene.List(
+        graphene.NonNull(graphene.Decimal)))
 
 
 class CreateOrUpdateProductMutation(OpenIMISMutation):
@@ -226,7 +233,8 @@ class ProductInputType(OpenIMISMutation.Input):
     registration_lump_sum = graphene.Decimal(
         max_digits=18, decimal_places=2, required=False
     )
-    registration_fee = graphene.Decimal(max_digits=18, decimal_places=2, required=False)
+    registration_fee = graphene.Decimal(
+        max_digits=18, decimal_places=2, required=False)
     general_assembly_lump_sum = graphene.Decimal(
         max_digits=18, decimal_places=2, required=False
     )
@@ -298,7 +306,8 @@ class ProductInputType(OpenIMISMutation.Input):
     max_amount_consultation = graphene.Decimal(max_digits=18, decimal_places=2)
     max_amount_surgery = graphene.Decimal(max_digits=18, decimal_places=2)
     max_amount_delivery = graphene.Decimal(max_digits=18, decimal_places=2)
-    max_amount_hospitalization = graphene.Decimal(max_digits=18, decimal_places=2)
+    max_amount_hospitalization = graphene.Decimal(
+        max_digits=18, decimal_places=2)
     max_amount_antenatal = graphene.Decimal(max_digits=18, decimal_places=2)
 
     relative_prices = graphene.List(RelativePricesInput)
