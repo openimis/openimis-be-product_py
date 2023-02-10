@@ -11,6 +11,7 @@ from graphene_django.filter import DjangoFilterConnectionField
 import graphene_django_optimizer as gql_optimizer
 
 from .models import Product, ProductItem, ProductService
+from .services import check_unique_code_product
 from .gql_mutations import (
     CreateProductMutation,
     UpdateProductMutation,
@@ -284,6 +285,11 @@ class Query(graphene.ObjectType):
         ProductGQLType, id=graphene.ID(), uuid=graphene.String())
     page_display_rules = graphene.Field(PageDisplayRulesGQLType)
     limit_defaults = graphene.Field(ProductItemOrServiceDefaultValuesGQLType)
+    validate_product_code = graphene.Field(
+        graphene.Boolean,
+        product_code=graphene.String(required=True),
+        description="Checks that the specified product code is unique."
+    )
 
     def resolve_limit_defaults(self, info):
         if not info.context.user.has_perms(ProductConfig.gql_query_products_perms):
@@ -335,6 +341,12 @@ class Query(graphene.ObjectType):
             info.context.user._u))
 
         return gql_optimizer.query(qs, info)
+
+    def resolve_validate_product_code(self, info, **kwargs):
+        if not info.context.user.has_perms(ProductConfig.gql_query_products_perms):
+            raise PermissionDenied(_("unauthorized"))
+        errors = check_unique_code_product(code=kwargs['product_code'])
+        return False if errors else True
 
 
 class Mutation(graphene.ObjectType):

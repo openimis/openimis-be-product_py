@@ -150,3 +150,10 @@ def set_product_services(product, services, user):
             audit_user_id=user.id_for_audit,
             **service,
         )
+
+
+def check_unique_code_product(code):
+    from .models import Product
+    if Product.objects.filter(code=code, validity_to__isnull=True).exists():
+        return [{"message": "Product code %s already exists" % code}]
+    return []
