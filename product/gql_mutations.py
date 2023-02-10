@@ -63,7 +63,7 @@ def create_or_update_product(user, data):
     ceilings = extract_ceilings(data)
 
     incoming_code = data.get('code')
-    current_product = Product.objects.filter(uuid=product_uuid)
+    current_product = Product.objects.filter(uuid=product_uuid).first()
     current_code = current_product.code if current_product else None
 
     if current_code != incoming_code:
