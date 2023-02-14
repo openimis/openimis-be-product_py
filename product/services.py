@@ -2,6 +2,7 @@ from core import datetime
 from django.apps import apps
 from core.utils import TimeUtils
 import logging
+from .models import Product
 
 from django.core.exceptions import ValidationError
 
@@ -150,3 +151,9 @@ def set_product_services(product, services, user):
             audit_user_id=user.id_for_audit,
             **service,
         )
+
+
+def check_unique_code_product(code):
+    if Product.objects.filter(code=code, validity_to__isnull=True).exists():
+        return [{"message": "Product code %s already exists" % code}]
+    return []

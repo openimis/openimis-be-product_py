@@ -14,6 +14,7 @@ from .services import (
     set_product_deductible_and_ceiling,
     save_product_history,
     set_product_services,
+    check_unique_code_product
 )
 from .apps import ProductConfig
 from .models import Product, ProductMutation
@@ -60,6 +61,14 @@ def create_or_update_product(user, data):
     ceiling_type = data.pop("ceiling_type", None)
     deductibles = extract_deductibles(data)
     ceilings = extract_ceilings(data)
+
+    incoming_code = data.get('code')
+    current_product = Product.objects.filter(uuid=product_uuid).first()
+    current_code = current_product.code if current_product else None
+
+    if current_code != incoming_code:
+        if check_unique_code_product(incoming_code):
+            raise ValidationError(_("mutation.product_code_duplicated"))
 
     # Validate start cycles
     for start_cycle_key in [
