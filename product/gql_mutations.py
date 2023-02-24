@@ -358,8 +358,8 @@ class UpdateProductMutation(CreateOrUpdateProductMutation):
     _mutation_class = "UpdateProductMutation"
 
     class Input(ProductInputType):
-        code = graphene.String(required=True)
         uuid = graphene.UUID(required=True)
+        code = graphene.String(required=True)
 
     @classmethod
     def async_mutate(cls, user, **data):
