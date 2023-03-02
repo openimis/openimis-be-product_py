@@ -60,7 +60,7 @@ def create_or_update_product(user, data):
     relative_prices = data.pop("relative_prices", None)
     items = data.pop("items", None)
     services = data.pop("services", None)
-    ceiling_type = data.pop("ceiling_type", None)
+    ceiling_type = data.get("ceiling_type", None)
     deductibles = extract_deductibles(data)
     ceilings = extract_ceilings(data)
 
@@ -112,7 +112,6 @@ def create_or_update_product(user, data):
 
     if data["date_from"] > data["date_to"]:
         raise ValueError("date_from must be before date_to")
-
     if product_uuid:
         product = Product.objects.get(uuid=product_uuid)
         save_product_history(product)
@@ -360,6 +359,7 @@ class UpdateProductMutation(CreateOrUpdateProductMutation):
 
     class Input(ProductInputType):
         uuid = graphene.UUID(required=True)
+        code = graphene.String(required=True)
 
     @classmethod
     def async_mutate(cls, user, **data):
