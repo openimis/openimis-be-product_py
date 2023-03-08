@@ -16,6 +16,7 @@ from .gql_mutations import (
     CreateProductMutation,
     UpdateProductMutation,
     DeleteProductMutation,
+    DuplicateProductMutation
 )
 from .apps import ProductConfig
 from django.utils.translation import gettext as _
@@ -351,6 +352,6 @@ class Query(graphene.ObjectType):
 
 class Mutation(graphene.ObjectType):
     create_product = CreateProductMutation.Field()
-    duplicate_product = UpdateProductMutation.Field()
+    duplicate_product = DuplicateProductMutation.Field()
     update_product = UpdateProductMutation.Field()
     delete_product = DeleteProductMutation.Field()

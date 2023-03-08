@@ -359,11 +359,13 @@ class DuplicateProductMutation(CreateOrUpdateProductMutation):
 
     class Input(ProductInputType):
         code = graphene.String(required=True)
+        uuid = graphene.UUID(required=False)
 
     @classmethod
     def async_mutate(cls, user, **data):
         try:
-            data.pop("uuid")
+            if 'uuid' in data:
+                data.pop("uuid")
             cls.do_mutate(
                 ProductConfig.gql_mutation_products_add_perms,
                 user,
