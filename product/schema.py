@@ -351,5 +351,6 @@ class Query(graphene.ObjectType):
 
 class Mutation(graphene.ObjectType):
     create_product = CreateProductMutation.Field()
+    duplicate_product = UpdateProductMutation.Field()
     update_product = UpdateProductMutation.Field()
     delete_product = DeleteProductMutation.Field()

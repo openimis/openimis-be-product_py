@@ -353,6 +353,37 @@ class CreateProductMutation(CreateOrUpdateProductMutation):
             ]
 
 
+class DuplicateProductMutation(CreateOrUpdateProductMutation):
+    _mutation_module = "product"
+    _mutation_class = "DuplicateProductMutation"
+
+    class Input(ProductInputType):
+        code = graphene.String(required=True)
+
+    @classmethod
+    def async_mutate(cls, user, **data):
+        try:
+            data.pop("uuid")
+            cls.do_mutate(
+                ProductConfig.gql_mutation_products_add_perms,
+                user,
+                **data,
+            )
+        except ValueError as exc:
+            return [
+                {
+                    "message": str(exc)
+                }
+            ]
+        except Exception as exc:
+            return [
+                {
+                    "message": _("product.mutation.failed_to_duplicate_product"),
+                    "detail": str(exc),
+                }
+            ]
+
+
 class UpdateProductMutation(CreateOrUpdateProductMutation):
     _mutation_module = "product"
     _mutation_class = "UpdateProductMutation"
