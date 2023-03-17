@@ -18,7 +18,7 @@ from .services import (
     check_unique_code_product
 )
 from .apps import ProductConfig
-from .models import Product, ProductMutation
+from .models import Product, ProductItem, ProductService, ProductMutation
 from .enums import (
     CareTypeEnum,
     CeilingExclusionEnum,
@@ -146,6 +146,8 @@ def create_or_update_product(user, data):
         ProductMutation.object_mutated(
             user, client_mutation_id=client_mutation_id, product=product
         )
+
+    return product
 
 
 class RelativePricesInput(graphene.InputObjectType):
@@ -353,7 +355,7 @@ class CreateProductMutation(CreateOrUpdateProductMutation):
             ]
 
 
-class DuplicateProductMutation(CreateOrUpdateProductMutation):
+class DuplicateProductMutation(OpenIMISMutation):
     _mutation_module = "product"
     _mutation_class = "DuplicateProductMutation"
 
@@ -364,8 +366,6 @@ class DuplicateProductMutation(CreateOrUpdateProductMutation):
     @classmethod
     def async_mutate(cls, user, **data):
         try:
-            if 'uuid' in data:
-                data.pop("uuid")
             cls.do_mutate(
                 ProductConfig.gql_mutation_products_add_perms,
                 user,
@@ -384,6 +384,36 @@ class DuplicateProductMutation(CreateOrUpdateProductMutation):
                     "detail": str(exc),
                 }
             ]
+
+    @classmethod
+    def do_mutate(cls, perms, user, **data):
+        if type(user) is AnonymousUser or not user.id:
+            raise ValidationError(_("mutation.authentication_required"))
+        if not user.has_perms(perms):
+            raise PermissionDenied(_("unauthorized"))
+        current_uuid = data.pop("uuid") if "uuid" in data else None
+
+        data["audit_user_id"] = user.id_for_audit
+
+        new_product = create_or_update_product(user, data)
+
+        if 'items' not in data:
+            new_product_items = ProductItem.objects.filter(product=Product.objects.get(uuid=current_uuid,
+                                                           validity_to__isnull=True))
+            for item in new_product_items:
+                item.pk = None
+                item.product = new_product
+                item.save()
+
+        if 'services' not in data:
+            new_product_services = ProductService.objects.filter(product=Product.objects.get(uuid=current_uuid,
+                                                                 validity_to__isnull=True))
+            for service in new_product_services:
+                service.pk = None
+                service.product = new_product
+                service.save()
+
+        return new_product
 
 
 class UpdateProductMutation(CreateOrUpdateProductMutation):
