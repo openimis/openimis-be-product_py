@@ -51,7 +51,7 @@ def extract_ceilings(data):
     )
 
 
-def create_or_update_product(user, data):
+def create_or_update_product(user, data, is_duplicate=False):
     client_mutation_id = data.pop("client_mutation_id", None)
     data.pop("client_mutation_label", None)
     product_uuid = data.pop("uuid", None)
@@ -147,7 +147,8 @@ def create_or_update_product(user, data):
             user, client_mutation_id=client_mutation_id, product=product
         )
 
-    return product
+    if is_duplicate:
+        return product
 
 
 class RelativePricesInput(graphene.InputObjectType):
@@ -395,9 +396,12 @@ class DuplicateProductMutation(OpenIMISMutation):
 
         data["audit_user_id"] = user.id_for_audit
 
-        new_product = create_or_update_product(user, data)
+        duplicate_items = True if 'items' not in data else False
+        duplicate_services = True if 'services' not in data else False
 
-        if 'items' not in data:
+        new_product = create_or_update_product(user, data, is_duplicate=True)
+
+        if duplicate_items:
             new_product_items = ProductItem.objects.filter(product=Product.objects.get(uuid=current_uuid,
                                                            validity_to__isnull=True))
             for item in new_product_items:
@@ -405,7 +409,7 @@ class DuplicateProductMutation(OpenIMISMutation):
                 item.product = new_product
                 item.save()
 
-        if 'services' not in data:
+        if duplicate_services:
             new_product_services = ProductService.objects.filter(product=Product.objects.get(uuid=current_uuid,
                                                                  validity_to__isnull=True))
             for service in new_product_services:
