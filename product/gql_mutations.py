@@ -18,7 +18,7 @@ from .services import (
     check_unique_code_product
 )
 from .apps import ProductConfig
-from .models import Product, ProductMutation
+from .models import Product, ProductItem, ProductService, ProductMutation
 from .enums import (
     CareTypeEnum,
     CeilingExclusionEnum,
@@ -51,7 +51,7 @@ def extract_ceilings(data):
     )
 
 
-def create_or_update_product(user, data):
+def create_or_update_product(user, data, is_duplicate=False):
     client_mutation_id = data.pop("client_mutation_id", None)
     data.pop("client_mutation_label", None)
     product_uuid = data.pop("uuid", None)
@@ -146,6 +146,9 @@ def create_or_update_product(user, data):
         ProductMutation.object_mutated(
             user, client_mutation_id=client_mutation_id, product=product
         )
+
+    if is_duplicate:
+        return product
 
 
 class RelativePricesInput(graphene.InputObjectType):
@@ -351,6 +354,72 @@ class CreateProductMutation(CreateOrUpdateProductMutation):
                     "detail": str(exc),
                 }
             ]
+
+
+class DuplicateProductMutation(OpenIMISMutation):
+    _mutation_module = "product"
+    _mutation_class = "DuplicateProductMutation"
+
+    class Input(ProductInputType):
+        code = graphene.String(required=True)
+        uuid = graphene.UUID(required=False)
+
+    @classmethod
+    def async_mutate(cls, user, **data):
+        try:
+            cls.do_mutate(
+                ProductConfig.gql_mutation_products_add_perms,
+                user,
+                **data,
+            )
+        except ValueError as exc:
+            return [
+                {
+                    "message": str(exc)
+                }
+            ]
+        except Exception as exc:
+            return [
+                {
+                    "message": _("product.mutation.failed_to_duplicate_product"),
+                    "detail": str(exc),
+                }
+            ]
+
+    @classmethod
+    def do_mutate(cls, perms, user, **data):
+        if type(user) is AnonymousUser or not user.id:
+            raise ValidationError(_("mutation.authentication_required"))
+        if not user.has_perms(perms):
+            raise PermissionDenied(_("unauthorized"))
+        current_uuid = data.pop("uuid") if "uuid" in data else None
+
+        data["audit_user_id"] = user.id_for_audit
+
+        duplicate_items = True if 'items' not in data else False
+        duplicate_services = True if 'services' not in data else False
+
+        new_product = create_or_update_product(user, data, is_duplicate=True)
+
+        if duplicate_items:
+            new_product_items = ProductItem.objects.filter(product=Product.objects.get(uuid=current_uuid,
+                                                           validity_to__isnull=True))
+            for item in new_product_items:
+                # create a new instance by setting pk = None
+                item.pk = None
+                item.product = new_product
+                item.save()
+
+        if duplicate_services:
+            new_product_services = ProductService.objects.filter(product=Product.objects.get(uuid=current_uuid,
+                                                                 validity_to__isnull=True))
+            for service in new_product_services:
+                # create a new instance by setting pk = None
+                service.pk = None
+                service.product = new_product
+                service.save()
+
+        return new_product
 
 
 class UpdateProductMutation(CreateOrUpdateProductMutation):
