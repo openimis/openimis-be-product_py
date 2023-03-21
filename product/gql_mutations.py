@@ -405,6 +405,7 @@ class DuplicateProductMutation(OpenIMISMutation):
             new_product_items = ProductItem.objects.filter(product=Product.objects.get(uuid=current_uuid,
                                                            validity_to__isnull=True))
             for item in new_product_items:
+                # create a new instance by setting pk = None
                 item.pk = None
                 item.product = new_product
                 item.save()
