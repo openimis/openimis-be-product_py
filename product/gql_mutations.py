@@ -414,6 +414,7 @@ class DuplicateProductMutation(OpenIMISMutation):
             new_product_services = ProductService.objects.filter(product=Product.objects.get(uuid=current_uuid,
                                                                  validity_to__isnull=True))
             for service in new_product_services:
+                # create a new instance by setting pk = None
                 service.pk = None
                 service.product = new_product
                 service.save()
