@@ -428,7 +428,7 @@ class Product(VersionedModel):
         return self.max_members
 
     class Meta:
-        managed = True
+        managed = False
         db_table = "tblProduct"
 
     CEILING_INTERPRETATION_HOSPITAL = "H"
