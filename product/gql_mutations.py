@@ -18,7 +18,7 @@ from .services import (
     check_unique_code_product
 )
 from .apps import ProductConfig
-from .models import Product, ProductItem, ProductService, ProductMutation
+from .models import Product, ProductItem, ProductService, ProductMutation, LIMIT_CHOICES
 from .enums import (
     CareTypeEnum,
     CeilingExclusionEnum,
@@ -90,25 +90,33 @@ def create_or_update_product(user, data, is_duplicate=False):
 
     if items:
         for item in items:
-            values = [item['limit_adult'], item['limit_adult_e'], item['limit_adult_r'], item['limit_child'],
-                      item['limit_child_e'], item['limit_child_r']]
+            values = [(item['limitation_type'], item['limit_adult']),
+                      (item['limitation_type_e'], item['limit_adult_e']),
+                      (item['limitation_type_r'], item['limit_adult_r']),
+                      (item['limitation_type'], item['limit_child']),
+                      (item['limitation_type_e'], item['limit_child_e']),
+                      (item['limitation_type_r'], item['limit_child_r'])]
             # checking if value can be interpreted as percentage
             if not all([True if i >= 0 else False for i in values]):
                 raise ValueError("Item O,R,E limits must be positive.")
-            if not all([True if i <= 100 else False for i in values]):
+            if not all([True if i[1] <= 100 else False for i in values if i[0] != LIMIT_CHOICES[0][0]]):
                 raise ValueError(
-                    "Item O,R,E limits must smaller or equal to 100.")
+                    "Item O,R,E co-insurance limits must be smaller or equal to 100.")
 
     if services:
         for service in services:
-            values = [service['limit_adult'], service['limit_adult_e'], service['limit_adult_r'],
-                      service['limit_child'], service['limit_child_e'], service['limit_child_r']]
+            values = [(service['limitation_type'], service['limit_adult']),
+                      (service['limitation_type_e'], service['limit_adult_e']),
+                      (service['limitation_type_r'], service['limit_adult_r']),
+                      (service['limitation_type'], service['limit_child']),
+                      (service['limitation_type_e'], service['limit_child_e']),
+                      (service['limitation_type_r'], service['limit_child_r'])]
             # checking if value can be interpreted as percentage
-            if not all([True if i >= 0 else False for i in values]):
+            if not all([True if i[1] >= 0 else False for i in values]):
                 raise ValueError("Service O,R,E limits must be positive.")
-            if not all([True if i <= 100 else False for i in values]):
+            if not all([True if i[1] <= 100 else False for i in values if i[0] != LIMIT_CHOICES[0][0]]):
                 raise ValueError(
-                    "Service O,R,E limits must smaller or equal to 100.")
+                    "Service O,R,E co-insurance limits must be smaller or equal to 100.")
 
     if data["date_from"] > data["date_to"]:
         raise ValueError("date_from must be before date_to")
