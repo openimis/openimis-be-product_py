@@ -97,7 +97,7 @@ def create_or_update_product(user, data, is_duplicate=False):
                       (item['limitation_type_e'], item['limit_child_e']),
                       (item['limitation_type_r'], item['limit_child_r'])]
             # checking if value can be interpreted as percentage
-            if not all([True if i >= 0 else False for i in values]):
+            if not all([True if i[1] >= 0 else False for i in values]):
                 raise ValueError("Item O,R,E limits must be positive.")
             if not all([True if i[1] <= 100 else False for i in values if i[0] != LIMIT_CHOICES[0][0]]):
                 raise ValueError(
