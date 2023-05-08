@@ -3,6 +3,7 @@
 import core.fields
 import datetime
 from django.db import migrations, models
+import django.db.models.deletion
 import product.models
 import uuid
 
@@ -12,6 +13,9 @@ class Migration(migrations.Migration):
     initial = True
 
     dependencies = [
+        ('location',
+         '0005_healthfacilitycatchment_healthfacilitylegalform_healthfacilitymutation_healthfacilitysublevel'),
+        ('medical', '0003_mutations')
     ]
 
     operations = [
@@ -93,11 +97,17 @@ class Migration(migrations.Migration):
                 ('max_ceiling_policy_op', models.DecimalField(blank=True, db_column='MaxCeilingPolicyOP', decimal_places=2, max_digits=18, null=True)),
                 ('max_amount_antenatal', models.DecimalField(blank=True, db_column='MaxAmountAntenatal', decimal_places=2, max_digits=18, null=True)),
                 ('max_no_antenatal', models.IntegerField(blank=True, db_column='MaxNoAntenatal', null=True)),
-                ('ceiling_interpretation', models.CharField(blank=True, db_column='CeilingInterpretation', max_length=1, null=True)),
+                ('ceiling_interpretation', models.CharField(blank=True, db_column='CeilingInterpretation', max_length=1, null=True, choices=[('I', 'Claim Type'), ('H', 'Health Facility Type')])),
                 ('capitation_level_1', models.CharField(blank=True, db_column='Level1', max_length=1, null=True)),
                 ('capitation_level_2', models.CharField(blank=True, db_column='Level2', max_length=1, null=True)),
                 ('capitation_level_3', models.CharField(blank=True, db_column='Level3', max_length=1, null=True)),
                 ('capitation_level_4', models.CharField(blank=True, db_column='Level4', max_length=1, null=True)),
+                ('capitation_sublevel_1', models.ForeignKey(blank=True, db_column="Sublevel1", null=True, on_delete=django.db.models.deletion.DO_NOTHING,  related_name="+", to='location.healthfacilitysublevel')),
+                ('capitation_sublevel_2', models.ForeignKey(blank=True, db_column="Sublevel2", null=True, on_delete=django.db.models.deletion.DO_NOTHING,  related_name="+", to='location.healthfacilitysublevel')),
+                ('capitation_sublevel_3', models.ForeignKey(blank=True, db_column="Sublevel3", null=True, on_delete=django.db.models.deletion.DO_NOTHING, related_name="+", to='location.healthfacilitysublevel')),
+                ('capitation_sublevel_4', models.ForeignKey(blank=True, db_column="Sublevel4", null=True, on_delete=django.db.models.deletion.DO_NOTHING, related_name="+", to='location.healthfacilitysublevel')),
+                ('conversion_product', models.ForeignKey("product.product", models.DO_NOTHING, db_column="ConversionProdID", blank=True, null=True)),
+                ('location', models.ForeignKey("location.location", models.DO_NOTHING, db_column="LocationId", blank=True, null=True)),
                 ('weight_population', models.DecimalField(blank=True, db_column='WeightPopulation', decimal_places=2, max_digits=5, null=True)),
                 ('weight_nb_families', models.DecimalField(blank=True, db_column='WeightNumberFamilies', decimal_places=2, max_digits=5, null=True)),
                 ('weight_insured_population', models.DecimalField(blank=True, db_column='WeightInsuredPopulation', decimal_places=2, max_digits=5, null=True)),
@@ -117,16 +127,12 @@ class Migration(migrations.Migration):
                 ('validity_to', core.fields.DateTimeField(blank=True, db_column='ValidityTo', null=True)),
                 ('legacy_id', models.IntegerField(blank=True, db_column='LegacyID', null=True)),
                 ('id', models.AutoField(db_column='ProdItemID', primary_key=True, serialize=False)),
-                ('limitation_type', models.CharField(blank=True, db_column='LimitationType', max_length=1, null=True)),
-                ('price_origin', models.CharField(blank=True, db_column='PriceOrigin', max_length=1, null=True)),
                 ('limit_adult', models.DecimalField(blank=True, db_column='LimitAdult', decimal_places=2, max_digits=18, null=True)),
                 ('limit_child', models.DecimalField(blank=True, db_column='LimitChild', decimal_places=2, max_digits=18, null=True)),
                 ('waiting_period_adult', models.IntegerField(blank=True, db_column='WaitingPeriodAdult', null=True)),
                 ('waiting_period_child', models.IntegerField(blank=True, db_column='WaitingPeriodChild', null=True)),
                 ('limit_no_adult', models.IntegerField(blank=True, db_column='LimitNoAdult', null=True)),
                 ('limit_no_child', models.IntegerField(blank=True, db_column='LimitNoChild', null=True)),
-                ('limitation_type_r', models.CharField(blank=True, db_column='LimitationTypeR', max_length=1, null=True)),
-                ('limitation_type_e', models.CharField(blank=True, db_column='LimitationTypeE', max_length=1, null=True)),
                 ('limit_adult_r', models.DecimalField(blank=True, db_column='LimitAdultR', decimal_places=2, max_digits=18, null=True)),
                 ('limit_adult_e', models.DecimalField(blank=True, db_column='LimitAdultE', decimal_places=2, max_digits=18, null=True)),
                 ('limit_child_r', models.DecimalField(blank=True, db_column='LimitChildR', decimal_places=2, max_digits=18, null=True)),
@@ -134,10 +140,28 @@ class Migration(migrations.Migration):
                 ('ceiling_exclusion_adult', models.CharField(blank=True, db_column='CeilingExclusionAdult', max_length=1, null=True)),
                 ('ceiling_exclusion_child', models.CharField(blank=True, db_column='CeilingExclusionChild', max_length=1, null=True)),
                 ('audit_user_id', models.IntegerField(db_column='AuditUserID')),
+                ('item', models.ForeignKey(
+                    db_column='ItemID', on_delete=django.db.models.deletion.DO_NOTHING,
+                    related_name='items', to='medical.item')),
+                ('product', models.ForeignKey(
+                    db_column='ProdID', on_delete=django.db.models.deletion.DO_NOTHING,
+                    related_name='items', to='product.product')),
+                ('limitation_type', models.CharField(
+                    blank=True, choices=[('F', 'Fixed'), ('C', 'Co-insurance')],
+                    db_column='LimitationType', max_length=1, null=True)),
+                ('limitation_type_e', models.CharField(
+                    blank=True, choices=[('F', 'Fixed'), ('C', 'Co-insurance')],
+                    db_column='LimitationTypeE', max_length=1, null=True)),
+                ('limitation_type_r', models.CharField(
+                    blank=True, choices=[('F', 'Fixed'), ('C', 'Co-insurance')],
+                    db_column='LimitationTypeR', max_length=1, null=True)),
+                ('price_origin', models.CharField(
+                    blank=True, choices=[('P', 'Schema Price'), ('O', 'Providers Own Price'), ('R', 'Relative Price')],
+                    db_column='PriceOrigin', max_length=1, null=True)),
             ],
             options={
                 'db_table': 'tblProductItems',
-                'managed': False,
+                'managed': True,
             },
             bases=(models.Model, product.models.ProductItemOrService),
         ),
@@ -148,16 +172,12 @@ class Migration(migrations.Migration):
                 ('validity_to', core.fields.DateTimeField(blank=True, db_column='ValidityTo', null=True)),
                 ('legacy_id', models.IntegerField(blank=True, db_column='LegacyID', null=True)),
                 ('id', models.AutoField(db_column='ProdServiceID', primary_key=True, serialize=False)),
-                ('limitation_type', models.CharField(db_column='LimitationType', max_length=1)),
-                ('price_origin', models.CharField(db_column='PriceOrigin', max_length=1)),
                 ('limit_adult', models.DecimalField(blank=True, db_column='LimitAdult', decimal_places=2, max_digits=18, null=True)),
                 ('limit_child', models.DecimalField(blank=True, db_column='LimitChild', decimal_places=2, max_digits=18, null=True)),
                 ('waiting_period_adult', models.IntegerField(blank=True, db_column='WaitingPeriodAdult', null=True)),
                 ('waiting_period_child', models.IntegerField(blank=True, db_column='WaitingPeriodChild', null=True)),
                 ('limit_no_adult', models.IntegerField(blank=True, db_column='LimitNoAdult', null=True)),
                 ('limit_no_child', models.IntegerField(blank=True, db_column='LimitNoChild', null=True)),
-                ('limitation_type_r', models.CharField(blank=True, db_column='LimitationTypeR', max_length=1, null=True)),
-                ('limitation_type_e', models.CharField(blank=True, db_column='LimitationTypeE', max_length=1, null=True)),
                 ('limit_adult_r', models.DecimalField(blank=True, db_column='LimitAdultR', decimal_places=2, max_digits=18, null=True)),
                 ('limit_adult_e', models.DecimalField(blank=True, db_column='LimitAdultE', decimal_places=2, max_digits=18, null=True)),
                 ('limit_child_r', models.DecimalField(blank=True, db_column='LimitChildR', decimal_places=2, max_digits=18, null=True)),
@@ -165,10 +185,29 @@ class Migration(migrations.Migration):
                 ('ceiling_exclusion_adult', models.CharField(blank=True, db_column='CeilingExclusionAdult', max_length=1, null=True)),
                 ('ceiling_exclusion_child', models.CharField(blank=True, db_column='CeilingExclusionChild', max_length=1, null=True)),
                 ('audit_user_id', models.IntegerField(db_column='AuditUserID')),
+                ('product', models.ForeignKey(
+                    db_column='ProdID', on_delete=django.db.models.deletion.DO_NOTHING,
+                    related_name='services', to='product.product')),
+                ('service', models.ForeignKey(
+                    db_column='ServiceID', on_delete=django.db.models.deletion.DO_NOTHING,
+                    related_name='services', to='medical.service')),
+                ('limitation_type', models.CharField(
+                    choices=[('F', 'Fixed'), ('C', 'Co-insurance')], db_column='LimitationType',
+                    max_length=1)),
+                ('limitation_type_e', models.CharField(
+                    blank=True, choices=[('F', 'Fixed'), ('C', 'Co-insurance')],
+                    db_column='LimitationTypeE', max_length=1, null=True)),
+                ('limitation_type_r', models.CharField(
+                    blank=True, choices=[('F', 'Fixed'), ('C', 'Co-insurance')],
+                    db_column='LimitationTypeR', max_length=1, null=True)),
+                ('price_origin', models.CharField(
+                    choices=[('P', 'Schema Price'), ('O', 'Providers Own Price'), ('R', 'Relative Price')],
+                    db_column='PriceOrigin', max_length=1)),
+
             ],
             options={
                 'db_table': 'tblProductServices',
-                'managed': False,
+                'managed': True,
             },
             bases=(models.Model, product.models.ProductItemOrService),
         ),
