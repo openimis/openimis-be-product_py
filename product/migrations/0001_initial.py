@@ -2,16 +2,149 @@
 
 import core.fields
 import datetime
-from django.db import migrations, models
+from django.db import migrations, models, connection
 import django.db.models.deletion
 import product.models
 import uuid
 
 
+def create_product_item(apps, schema_editor):
+    if 'tblProductItems' not in connection.introspection.table_names():
+        product_item = apps.get_model('product', 'ProductItem')
+        db_alias = schema_editor.connection.alias
+        fields = [
+            ('validity_from', core.fields.DateTimeField(db_column='ValidityFrom', default=datetime.datetime.now)),
+            ('validity_to', core.fields.DateTimeField(blank=True, db_column='ValidityTo', null=True)),
+            ('legacy_id', models.IntegerField(blank=True, db_column='LegacyID', null=True)),
+            ('id', models.AutoField(db_column='ProdItemID', primary_key=True, serialize=False)),
+            ('limit_adult',
+             models.DecimalField(blank=True, db_column='LimitAdult', decimal_places=2, max_digits=18, null=True)),
+            ('limit_child',
+             models.DecimalField(blank=True, db_column='LimitChild', decimal_places=2, max_digits=18, null=True)),
+            ('waiting_period_adult', models.IntegerField(blank=True, db_column='WaitingPeriodAdult', null=True)),
+            ('waiting_period_child', models.IntegerField(blank=True, db_column='WaitingPeriodChild', null=True)),
+            ('limit_no_adult', models.IntegerField(blank=True, db_column='LimitNoAdult', null=True)),
+            ('limit_no_child', models.IntegerField(blank=True, db_column='LimitNoChild', null=True)),
+            ('limit_adult_r',
+             models.DecimalField(blank=True, db_column='LimitAdultR', decimal_places=2, max_digits=18, null=True)),
+            ('limit_adult_e',
+             models.DecimalField(blank=True, db_column='LimitAdultE', decimal_places=2, max_digits=18, null=True)),
+            ('limit_child_r',
+             models.DecimalField(blank=True, db_column='LimitChildR', decimal_places=2, max_digits=18, null=True)),
+            ('limit_child_e',
+             models.DecimalField(blank=True, db_column='LimitChildE', decimal_places=2, max_digits=18, null=True)),
+            ('ceiling_exclusion_adult',
+             models.CharField(blank=True, db_column='CeilingExclusionAdult', max_length=1, null=True)),
+            ('ceiling_exclusion_child',
+             models.CharField(blank=True, db_column='CeilingExclusionChild', max_length=1, null=True)),
+            ('audit_user_id', models.IntegerField(db_column='AuditUserID')),
+            ('item', models.ForeignKey(
+                db_column='ItemID', on_delete=django.db.models.deletion.DO_NOTHING,
+                related_name='items', to='medical.item')),
+            ('product', models.ForeignKey(
+                db_column='ProdID', on_delete=django.db.models.deletion.DO_NOTHING,
+                related_name='items', to='product.product')),
+            ('limitation_type', models.CharField(
+                blank=True, choices=[('F', 'Fixed'), ('C', 'Co-insurance')],
+                db_column='LimitationType', max_length=1, null=True)),
+            ('limitation_type_e', models.CharField(
+                blank=True, choices=[('F', 'Fixed'), ('C', 'Co-insurance')],
+                db_column='LimitationTypeE', max_length=1, null=True)),
+            ('limitation_type_r', models.CharField(
+                blank=True, choices=[('F', 'Fixed'), ('C', 'Co-insurance')],
+                db_column='LimitationTypeR', max_length=1, null=True)),
+            ('price_origin', models.CharField(
+                blank=True, choices=[('P', 'Schema Price'), ('O', 'Providers Own Price'), ('R', 'Relative Price')],
+                db_column='PriceOrigin', max_length=1, null=True)),
+        ]
+        options = {
+            'db_table': 'tblProductItems',
+            'managed': True,
+        }
+        model = type('ProductItem', (models.Model,), {
+            '__module__': product_item.__module__,
+            **dict(fields),
+            **options,
+        })
+        model._meta.local_fields = [model._meta.get_field(field_name) for field_name, _ in fields]
+        model._meta.apps = apps
+        model._meta.db_table = options['db_table']
+        model._meta.managed = options['managed']
+        model._meta.db_alias = db_alias
+        model._meta.swapped = False
+        models.register_model('product', model)
+
+
+def create_product_service(apps, schema_editor):
+    if 'tblProductServices' not in connection.introspection.table_names():
+        product_service = apps.get_model('product', 'ProductService')
+        db_alias = schema_editor.connection.alias
+        fields = [
+            ('validity_from', core.fields.DateTimeField(db_column='ValidityFrom', default=datetime.datetime.now)),
+            ('validity_to', core.fields.DateTimeField(blank=True, db_column='ValidityTo', null=True)),
+            ('legacy_id', models.IntegerField(blank=True, db_column='LegacyID', null=True)),
+            ('id', models.AutoField(db_column='ProdServiceID', primary_key=True, serialize=False)),
+            ('limit_adult',
+             models.DecimalField(blank=True, db_column='LimitAdult', decimal_places=2, max_digits=18, null=True)),
+            ('limit_child',
+             models.DecimalField(blank=True, db_column='LimitChild', decimal_places=2, max_digits=18, null=True)),
+            ('waiting_period_adult', models.IntegerField(blank=True, db_column='WaitingPeriodAdult', null=True)),
+            ('waiting_period_child', models.IntegerField(blank=True, db_column='WaitingPeriodChild', null=True)),
+            ('limit_no_adult', models.IntegerField(blank=True, db_column='LimitNoAdult', null=True)),
+            ('limit_no_child', models.IntegerField(blank=True, db_column='LimitNoChild', null=True)),
+            ('limit_adult_r',
+             models.DecimalField(blank=True, db_column='LimitAdultR', decimal_places=2, max_digits=18, null=True)),
+            ('limit_adult_e',
+             models.DecimalField(blank=True, db_column='LimitAdultE', decimal_places=2, max_digits=18, null=True)),
+            ('limit_child_r',
+             models.DecimalField(blank=True, db_column='LimitChildR', decimal_places=2, max_digits=18, null=True)),
+            ('limit_child_e',
+             models.DecimalField(blank=True, db_column='LimitChildE', decimal_places=2, max_digits=18, null=True)),
+            ('ceiling_exclusion_adult',
+             models.CharField(blank=True, db_column='CeilingExclusionAdult', max_length=1, null=True)),
+            ('ceiling_exclusion_child',
+             models.CharField(blank=True, db_column='CeilingExclusionChild', max_length=1, null=True)),
+            ('audit_user_id', models.IntegerField(db_column='AuditUserID')),
+            ('product', models.ForeignKey(
+                db_column='ProdID', on_delete=django.db.models.deletion.DO_NOTHING,
+                related_name='services', to='product.product')),
+            ('service', models.ForeignKey(
+                db_column='ServiceID', on_delete=django.db.models.deletion.DO_NOTHING,
+                related_name='services', to='medical.service')),
+            ('limitation_type', models.CharField(
+                choices=[('F', 'Fixed'), ('C', 'Co-insurance')], db_column='LimitationType',
+                max_length=1)),
+            ('limitation_type_e', models.CharField(
+                blank=True, choices=[('F', 'Fixed'), ('C', 'Co-insurance')],
+                db_column='LimitationTypeE', max_length=1, null=True)),
+            ('limitation_type_r', models.CharField(
+                blank=True, choices=[('F', 'Fixed'), ('C', 'Co-insurance')],
+                db_column='LimitationTypeR', max_length=1, null=True)),
+            ('price_origin', models.CharField(
+                choices=[('P', 'Schema Price'), ('O', 'Providers Own Price'), ('R', 'Relative Price')],
+                db_column='PriceOrigin', max_length=1)),
+        ]
+        options = {
+            'db_table': 'tblProductServices',
+            'managed': True,
+        }
+        model = type('ProductService', (models.Model,), {
+            '__module__': product_service.__module__,
+            **dict(fields),
+            **options,
+        })
+        model._meta.local_fields = [model._meta.get_field(field_name) for field_name, _ in fields]
+        model._meta.apps = apps
+        model._meta.db_table = options['db_table']
+        model._meta.managed = options['managed']
+        model._meta.db_alias = db_alias
+        model._meta.swapped = False
+        models.register_model('product', model)
+
+
 class Migration(migrations.Migration):
 
     initial = True
-
     dependencies = [
         ('location',
          '0005_healthfacilitycatchment_healthfacilitylegalform_healthfacilitymutation_healthfacilitysublevel'),
@@ -120,95 +253,6 @@ class Migration(migrations.Migration):
                 'managed': False,
             },
         ),
-        migrations.CreateModel(
-            name='ProductItem',
-            fields=[
-                ('validity_from', core.fields.DateTimeField(db_column='ValidityFrom', default=datetime.datetime.now)),
-                ('validity_to', core.fields.DateTimeField(blank=True, db_column='ValidityTo', null=True)),
-                ('legacy_id', models.IntegerField(blank=True, db_column='LegacyID', null=True)),
-                ('id', models.AutoField(db_column='ProdItemID', primary_key=True, serialize=False)),
-                ('limit_adult', models.DecimalField(blank=True, db_column='LimitAdult', decimal_places=2, max_digits=18, null=True)),
-                ('limit_child', models.DecimalField(blank=True, db_column='LimitChild', decimal_places=2, max_digits=18, null=True)),
-                ('waiting_period_adult', models.IntegerField(blank=True, db_column='WaitingPeriodAdult', null=True)),
-                ('waiting_period_child', models.IntegerField(blank=True, db_column='WaitingPeriodChild', null=True)),
-                ('limit_no_adult', models.IntegerField(blank=True, db_column='LimitNoAdult', null=True)),
-                ('limit_no_child', models.IntegerField(blank=True, db_column='LimitNoChild', null=True)),
-                ('limit_adult_r', models.DecimalField(blank=True, db_column='LimitAdultR', decimal_places=2, max_digits=18, null=True)),
-                ('limit_adult_e', models.DecimalField(blank=True, db_column='LimitAdultE', decimal_places=2, max_digits=18, null=True)),
-                ('limit_child_r', models.DecimalField(blank=True, db_column='LimitChildR', decimal_places=2, max_digits=18, null=True)),
-                ('limit_child_e', models.DecimalField(blank=True, db_column='LimitChildE', decimal_places=2, max_digits=18, null=True)),
-                ('ceiling_exclusion_adult', models.CharField(blank=True, db_column='CeilingExclusionAdult', max_length=1, null=True)),
-                ('ceiling_exclusion_child', models.CharField(blank=True, db_column='CeilingExclusionChild', max_length=1, null=True)),
-                ('audit_user_id', models.IntegerField(db_column='AuditUserID')),
-                ('item', models.ForeignKey(
-                    db_column='ItemID', on_delete=django.db.models.deletion.DO_NOTHING,
-                    related_name='items', to='medical.item')),
-                ('product', models.ForeignKey(
-                    db_column='ProdID', on_delete=django.db.models.deletion.DO_NOTHING,
-                    related_name='items', to='product.product')),
-                ('limitation_type', models.CharField(
-                    blank=True, choices=[('F', 'Fixed'), ('C', 'Co-insurance')],
-                    db_column='LimitationType', max_length=1, null=True)),
-                ('limitation_type_e', models.CharField(
-                    blank=True, choices=[('F', 'Fixed'), ('C', 'Co-insurance')],
-                    db_column='LimitationTypeE', max_length=1, null=True)),
-                ('limitation_type_r', models.CharField(
-                    blank=True, choices=[('F', 'Fixed'), ('C', 'Co-insurance')],
-                    db_column='LimitationTypeR', max_length=1, null=True)),
-                ('price_origin', models.CharField(
-                    blank=True, choices=[('P', 'Schema Price'), ('O', 'Providers Own Price'), ('R', 'Relative Price')],
-                    db_column='PriceOrigin', max_length=1, null=True)),
-            ],
-            options={
-                'db_table': 'tblProductItems',
-                'managed': True,
-            },
-            bases=(models.Model, product.models.ProductItemOrService),
-        ),
-        migrations.CreateModel(
-            name='ProductService',
-            fields=[
-                ('validity_from', core.fields.DateTimeField(db_column='ValidityFrom', default=datetime.datetime.now)),
-                ('validity_to', core.fields.DateTimeField(blank=True, db_column='ValidityTo', null=True)),
-                ('legacy_id', models.IntegerField(blank=True, db_column='LegacyID', null=True)),
-                ('id', models.AutoField(db_column='ProdServiceID', primary_key=True, serialize=False)),
-                ('limit_adult', models.DecimalField(blank=True, db_column='LimitAdult', decimal_places=2, max_digits=18, null=True)),
-                ('limit_child', models.DecimalField(blank=True, db_column='LimitChild', decimal_places=2, max_digits=18, null=True)),
-                ('waiting_period_adult', models.IntegerField(blank=True, db_column='WaitingPeriodAdult', null=True)),
-                ('waiting_period_child', models.IntegerField(blank=True, db_column='WaitingPeriodChild', null=True)),
-                ('limit_no_adult', models.IntegerField(blank=True, db_column='LimitNoAdult', null=True)),
-                ('limit_no_child', models.IntegerField(blank=True, db_column='LimitNoChild', null=True)),
-                ('limit_adult_r', models.DecimalField(blank=True, db_column='LimitAdultR', decimal_places=2, max_digits=18, null=True)),
-                ('limit_adult_e', models.DecimalField(blank=True, db_column='LimitAdultE', decimal_places=2, max_digits=18, null=True)),
-                ('limit_child_r', models.DecimalField(blank=True, db_column='LimitChildR', decimal_places=2, max_digits=18, null=True)),
-                ('limit_child_e', models.DecimalField(blank=True, db_column='LimitChildE', decimal_places=2, max_digits=18, null=True)),
-                ('ceiling_exclusion_adult', models.CharField(blank=True, db_column='CeilingExclusionAdult', max_length=1, null=True)),
-                ('ceiling_exclusion_child', models.CharField(blank=True, db_column='CeilingExclusionChild', max_length=1, null=True)),
-                ('audit_user_id', models.IntegerField(db_column='AuditUserID')),
-                ('product', models.ForeignKey(
-                    db_column='ProdID', on_delete=django.db.models.deletion.DO_NOTHING,
-                    related_name='services', to='product.product')),
-                ('service', models.ForeignKey(
-                    db_column='ServiceID', on_delete=django.db.models.deletion.DO_NOTHING,
-                    related_name='services', to='medical.service')),
-                ('limitation_type', models.CharField(
-                    choices=[('F', 'Fixed'), ('C', 'Co-insurance')], db_column='LimitationType',
-                    max_length=1)),
-                ('limitation_type_e', models.CharField(
-                    blank=True, choices=[('F', 'Fixed'), ('C', 'Co-insurance')],
-                    db_column='LimitationTypeE', max_length=1, null=True)),
-                ('limitation_type_r', models.CharField(
-                    blank=True, choices=[('F', 'Fixed'), ('C', 'Co-insurance')],
-                    db_column='LimitationTypeR', max_length=1, null=True)),
-                ('price_origin', models.CharField(
-                    choices=[('P', 'Schema Price'), ('O', 'Providers Own Price'), ('R', 'Relative Price')],
-                    db_column='PriceOrigin', max_length=1)),
-
-            ],
-            options={
-                'db_table': 'tblProductServices',
-                'managed': True,
-            },
-            bases=(models.Model, product.models.ProductItemOrService),
-        ),
+        migrations.RunPython(create_product_item),
+        migrations.RunPython(create_product_service),
     ]
