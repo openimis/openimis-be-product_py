@@ -122,6 +122,8 @@ def create_or_update_product(user, data, is_duplicate=False):
         raise ValueError("date_from must be before date_to")
     if product_uuid:
         product = Product.objects.get(uuid=product_uuid)
+        if product.validity_to:
+            raise ValidationError("Cannot update historical data.")
         save_product_history(product)
         for (key, value) in data.items():
             setattr(product, key, value)
