@@ -141,11 +141,8 @@ def create_or_update_product(user, data, is_duplicate=False):
         product, ceiling_type, deductibles, ceilings, user
     )
 
-    if items is not None:
-        set_product_items(product, items, user)
-
-    if services is not None:
-        set_product_services(product, services, user)
+    set_product_items(product, items, user)
+    set_product_services(product, services, user)
 
     product.validity_from = datetime.datetime.now()
     product.save()
