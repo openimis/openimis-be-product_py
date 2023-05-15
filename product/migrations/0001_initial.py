@@ -3,6 +3,7 @@
 import core.fields
 import datetime
 from django.db import migrations, models
+import django.db.models.deletion
 import product.models
 import uuid
 
@@ -93,7 +94,6 @@ class Migration(migrations.Migration):
                 ('max_ceiling_policy_op', models.DecimalField(blank=True, db_column='MaxCeilingPolicyOP', decimal_places=2, max_digits=18, null=True)),
                 ('max_amount_antenatal', models.DecimalField(blank=True, db_column='MaxAmountAntenatal', decimal_places=2, max_digits=18, null=True)),
                 ('max_no_antenatal', models.IntegerField(blank=True, db_column='MaxNoAntenatal', null=True)),
-                ('ceiling_interpretation', models.CharField(blank=True, db_column='CeilingInterpretation', max_length=1, null=True)),
                 ('capitation_level_1', models.CharField(blank=True, db_column='Level1', max_length=1, null=True)),
                 ('capitation_level_2', models.CharField(blank=True, db_column='Level2', max_length=1, null=True)),
                 ('capitation_level_3', models.CharField(blank=True, db_column='Level3', max_length=1, null=True)),
@@ -104,6 +104,13 @@ class Migration(migrations.Migration):
                 ('weight_nb_insured_families', models.DecimalField(blank=True, db_column='WeightNumberInsuredFamilies', decimal_places=2, max_digits=5, null=True)),
                 ('weight_nb_visits', models.DecimalField(blank=True, db_column='WeightNumberVisits', decimal_places=2, max_digits=5, null=True)),
                 ('weight_adjusted_amount', models.DecimalField(blank=True, db_column='WeightAdjustedAmount', decimal_places=2, max_digits=5, null=True)),
+                ('capitation_sublevel_1', models.ForeignKey(blank=True, db_column='Sublevel1', null=True, on_delete=django.db.models.deletion.DO_NOTHING, related_name='+', to='location.healthfacilitysublevel')),
+                ('capitation_sublevel_2', models.ForeignKey(blank=True, db_column='Sublevel2', null=True, on_delete=django.db.models.deletion.DO_NOTHING, related_name='+', to='location.healthfacilitysublevel')),
+                ('capitation_sublevel_3', models.ForeignKey(blank=True, db_column='Sublevel3', null=True, on_delete=django.db.models.deletion.DO_NOTHING, related_name='+', to='location.healthfacilitysublevel')),
+                ('capitation_sublevel_4', models.ForeignKey(blank=True, db_column='Sublevel4', null=True, on_delete=django.db.models.deletion.DO_NOTHING, related_name='+', to='location.healthfacilitysublevel')),
+                ('conversion_product', models.ForeignKey(blank=True, db_column='ConversionProdID', null=True, on_delete=django.db.models.deletion.DO_NOTHING, to='product.product')),
+                ('location', models.ForeignKey(blank=True, db_column='LocationId', null=True, on_delete=django.db.models.deletion.DO_NOTHING, to='location.location')),
+                ('ceiling_interpretation', models.CharField(blank=True, choices=[('I', 'Claim Type'), ('H', 'Health Facility Type')], db_column='CeilingInterpretation', max_length=1, null=True)),
             ],
             options={
                 'db_table': 'tblProduct',
