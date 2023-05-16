@@ -556,7 +556,7 @@ class ProductItem(VersionedModel, ProductItemOrService):
     objects = ProductItemOrServiceManager()
 
     class Meta:
-        managed = False
+        managed = True
         db_table = "tblProductItems"
 
 
@@ -643,7 +643,7 @@ class ProductService(VersionedModel, ProductItemOrService):
     objects = ProductItemOrServiceManager()
 
     class Meta:
-        managed = False
+        managed = True
         db_table = "tblProductServices"
 
 
