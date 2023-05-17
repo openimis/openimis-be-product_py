@@ -242,7 +242,7 @@ class ProductItemGQLType(DjangoObjectType):
 
     @classmethod
     def get_queryset(cls, queryset, info):
-        return queryset.filter(validity_to=None)
+        return queryset.filter()
 
     class Meta:
         model = ProductItem
@@ -263,7 +263,7 @@ class ProductServiceGQLType(DjangoObjectType):
 
     @classmethod
     def get_queryset(cls, queryset, info):
-        return queryset.filter(validity_to=None)
+        return queryset.filter()
 
     class Meta:
         model = ProductService

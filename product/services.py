@@ -114,19 +114,21 @@ def set_product_items(product, items, user):
     # Ensure there no duplicates
     seen_uuids = []
 
-    product.items.update(validity_to=TimeUtils.now())
-    for item in items:
-        uuid = item.pop("item_uuid")
-        if uuid in seen_uuids:
-            raise ValidationError(
-                f"'{uuid}' is already linked to the product.")
-        seen_uuids.append(uuid)
+    last_legacy_id = Product.objects.filter().last().id
+    product.items.update(validity_to=TimeUtils.now(), product_id=last_legacy_id)
+    if items:
+        for item in items:
+            uuid = item.pop("item_uuid")
+            if uuid in seen_uuids:
+                raise ValidationError(
+                    f"'{uuid}' is already linked to the product.")
+            seen_uuids.append(uuid)
 
-        product.items.create(
-            item=Item.objects.get(uuid=uuid),
-            audit_user_id=user.id_for_audit,
-            **item,
-        )
+            product.items.create(
+                item=Item.objects.get(uuid=uuid),
+                audit_user_id=user.id_for_audit,
+                **item,
+            )
 
 
 def set_product_services(product, services, user):
@@ -138,19 +140,21 @@ def set_product_services(product, services, user):
     # Ensure there no duplicates
     seen_uuids = []
 
-    product.services.update(validity_to=TimeUtils.now())
-    for service in services:
-        uuid = service.pop("service_uuid")
-        if uuid in seen_uuids:
-            raise ValidationError(
-                f"'{uuid}' is already linked to the product.")
-        seen_uuids.append(uuid)
+    last_legacy_id = Product.objects.filter().last().id
+    product.services.update(validity_to=TimeUtils.now(), product_id=last_legacy_id)
+    if services:
+        for service in services:
+            uuid = service.pop("service_uuid")
+            if uuid in seen_uuids:
+                raise ValidationError(
+                    f"'{uuid}' is already linked to the product.")
+            seen_uuids.append(uuid)
 
-        product.services.create(
-            service=Service.objects.get(uuid=uuid),
-            audit_user_id=user.id_for_audit,
-            **service,
-        )
+            product.services.create(
+                service=Service.objects.get(uuid=uuid),
+                audit_user_id=user.id_for_audit,
+                **service,
+            )
 
 
 def check_unique_code_product(code):
