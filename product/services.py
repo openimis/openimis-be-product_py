@@ -2,6 +2,7 @@ from core import datetime
 from django.apps import apps
 from core.utils import TimeUtils
 import logging
+from .models import Product
 
 from django.core.exceptions import ValidationError
 
@@ -23,7 +24,8 @@ periods_to_period_rel_prices = {1: "Y", 4: "Q", 12: "M"}
 
 
 def set_product_relative_distribution(user, product, relative_distributions):
-    RelativeDistribution = apps.get_model("claim_batch", "RelativeDistribution")
+    RelativeDistribution = apps.get_model(
+        "claim_batch", "RelativeDistribution")
     if RelativeDistribution is None:
         logger.warning("RelativeDistribution does not exist.")
         return
@@ -39,9 +41,6 @@ def set_product_relative_distribution(user, product, relative_distributions):
     for distr in relative_distributions:
         if len(distr.periods) not in (1, 4, 12):
             raise ValueError("Number of periods can only be 1, 4 or 12")
-
-        if sum([x for x in distr.periods]) != 100:
-            raise ValueError("Sum of periods must be 100%")
 
         setattr(
             product,
@@ -119,7 +118,8 @@ def set_product_items(product, items, user):
     for item in items:
         uuid = item.pop("item_uuid")
         if uuid in seen_uuids:
-            raise ValidationError(f"'{uuid}' is already linked to the product.")
+            raise ValidationError(
+                f"'{uuid}' is already linked to the product.")
         seen_uuids.append(uuid)
 
         product.items.create(
@@ -142,7 +142,8 @@ def set_product_services(product, services, user):
     for service in services:
         uuid = service.pop("service_uuid")
         if uuid in seen_uuids:
-            raise ValidationError(f"'{uuid}' is already linked to the product.")
+            raise ValidationError(
+                f"'{uuid}' is already linked to the product.")
         seen_uuids.append(uuid)
 
         product.services.create(
@@ -150,3 +151,9 @@ def set_product_services(product, services, user):
             audit_user_id=user.id_for_audit,
             **service,
         )
+
+
+def check_unique_code_product(code):
+    if Product.objects.filter(code=code, validity_to__isnull=True).exists():
+        return [{"message": "Product code %s already exists" % code}]
+    return []
