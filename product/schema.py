@@ -178,7 +178,6 @@ class ProductGQLType(DjangoObjectType):
             "weight_adjusted_amount",
             "product_set",
             "relativeindex_set",
-            "contributionplan_set",
             "period_rel_prices",
             "period_rel_prices_ip",
             "period_rel_prices_op",
