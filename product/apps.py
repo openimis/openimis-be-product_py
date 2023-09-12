@@ -37,38 +37,17 @@ class ProductConfig(AppConfig):
     default_limit_co_insurance_value = None
     default_limit_fixed_value = None
 
-    def _configure_permissions(self, cfg):
-        ProductConfig.gql_query_products_perms = cfg["gql_query_products_perms"]
-        ProductConfig.gql_mutation_products_add_perms = cfg[
-            "gql_mutation_products_add_perms"
-        ]
-        ProductConfig.gql_mutation_products_edit_perms = cfg[
-            "gql_mutation_products_edit_perms"
-        ]
-        ProductConfig.gql_mutation_products_delete_perms = cfg[
-            "gql_mutation_products_delete_perms"
-        ]
-        ProductConfig.gql_mutation_products_duplicate_perms = cfg[
-            "gql_mutation_products_duplicate_perms"
-        ]
-
-    def _configure_limit_values(self, cfg):
-        ProductConfig.min_limit_value = cfg['min_limit_value']
-        ProductConfig.max_limit_value = cfg['max_limit_value']
-
-    def _configure_default_values(self, cfg):
-        ProductConfig.default_price_origin = cfg["default_price_origin"]
-        ProductConfig.default_limit = cfg["default_limit"]
-        ProductConfig.default_limit_co_insurance_value = cfg["default_limit_co_insurance_value"]
-        ProductConfig.default_limit_fixed_value = cfg["default_limit_fixed_value"]
+    def __load_config(self, cfg):
+        for field in cfg:
+            if hasattr(ProductConfig, field):
+                setattr(ProductConfig, field, cfg[field])
 
     def ready(self):
         from core.models import ModuleConfiguration
 
         cfg = ModuleConfiguration.get_or_default(MODULE_NAME, DEFAULT_CFG)
-        self._configure_permissions(cfg)
-        self._configure_limit_values(cfg)
-        self._configure_default_values(cfg)
+        self.__load_config(cfg)
+
 
     def set_dataloaders(self, dataloaders):
         from .dataloaders import ProductLoader
