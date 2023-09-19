@@ -3,7 +3,7 @@ from core.services import  create_or_update_interactive_user,create_or_update_co
 from product.test_helpers import create_test_product, create_test_product_service, create_test_product_item
 from medical.test_helpers import create_test_service, create_test_item
 from product.gql_mutations import create_or_update_product
-
+import re
 _TEST_USER_NAME = "test_insuree_import"
 _TEST_USER_PWD = "test_insuree_import"
 _TEST_DATA_USER = {
@@ -102,10 +102,12 @@ class HelpersTest(TestCase):
 
         self.assertEquals(self.product.code, "ELI1")
         self.assertEquals(len(self.product.items.all()), 1)
-        self.assertEquals(len(self.product.services.all), 1)
+        self.assertEquals(len(self.product.services.all()), 1)
 
     def test_save_history(self):
-        create_or_update_product(self.user,DATA_MUTATION['variables']['input'])
+        pattern = re.compile(r'(?<!^)(?=[A-Z])')
+        data = {pattern.sub('_', key).lower(): value for key, value in DATA_MUTATION['variables']['input']}
+        create_or_update_product(self.user,data)
         self.assertEquals(self.product.code, "FCTA0041")
         self.assertEquals(len(self.product.items.all()), 1)
-        self.assertEquals(len(self.product.services.all), 0)
+        self.assertEquals(len(self.product.services.all()), 0)
