@@ -75,7 +75,7 @@ DATA_MUTATION={
             "relativePrices":[],
             "administrationPeriod":0,
             "uuid":"eaa082a0-d71e-4526-a918-3239b098afa7",
-            "code":"FCTA0001",
+            "code":"FCTA0041",
             "locationUuid":"68753566-9d2e-4cec-936e-4c6bf1968c0d",
             "clientMutationLabel":"Update product Fixed Cycle Cover Tahida",
             "clientMutationId":"a0b8d581-fa59-461a-9e29-a3d42200e13b"
@@ -101,11 +101,11 @@ class HelpersTest(TestCase):
     def test_helper(self):
 
         self.assertEquals(self.product.code, "ELI1")
-        self.assertEquals(self.product.items.all.count, 1)
-        self.assertEquals(self.product.services.all.count, 1)
+        self.assertEquals(len(self.product.items.all()), 1)
+        self.assertEquals(len(self.product.services.all), 1)
 
     def test_save_history(self):
         create_or_update_product(self.user,DATA_MUTATION['variables']['input'])
-        self.assertEquals(self.product.code, "FCTA0001")
-        self.assertEquals(self.product.items.all.count, 1)
-        self.assertEquals(self.product.services.all.count, 0)
+        self.assertEquals(self.product.code, "FCTA0041")
+        self.assertEquals(len(self.product.items.all()), 1)
+        self.assertEquals(len(self.product.services.all), 0)
