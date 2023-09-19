@@ -3,13 +3,8 @@ from django.test import TestCase
 from product.test_helpers import create_test_product, create_test_product_service, create_test_product_item
 from medical.test_helpers import create_test_service, create_test_item
 
-DATA_MUTATION="""{
-    "query":"mutation ($input: UpdateProductMutationInput!) {
-                updateProduct(input: $input) {
-                        internalId
-                        clientMutationId      
-                }
-            }",
+DATA_MUTATION={
+    "query":"mutation ($input: UpdateProductMutationInput!) {updateProduct(input: $input) { internalId clientMutationId }}",
     "variables":{"input":{
             "name":"Fixed Cycle Cover Tahida",
             "maxMembers":9999,
@@ -69,7 +64,7 @@ DATA_MUTATION="""{
             "clientMutationId":"a0b8d581-fa59-461a-9e29-a3d42200e13b"}
         }
     }
-"""
+
 class HelpersTest(TestCase):
     product=None
     user=None
