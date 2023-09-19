@@ -95,7 +95,7 @@ class HelpersTest(TestCase):
         service = create_test_service("V", custom_props={"code": "VVVV"})
         create_test_product_service(self.product, service, custom_props={"limit_no_adult": 20})
         item = create_test_item("A", custom_props={"name": "test_simple_batch"})
-        create_test_product_item(self.product, service, custom_props={"limit_no_adult": 20})
+        create_test_product_item(self.product, item, custom_props={"limit_no_adult": 20})
 
     def test_helper(self):
 
