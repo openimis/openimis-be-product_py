@@ -106,7 +106,7 @@ class HelpersTest(TestCase):
 
     def test_save_history(self):
         pattern = re.compile(r'(?<!^)(?=[A-Z])')
-        data = {pattern.sub('_', key).lower(): value for key, value in DATA_MUTATION['variables']['input']}
+        {pattern.sub('_', key).lower(): DATA_MUTATION['variables']['input'][key] for key in DATA_MUTATION['variables']['input']}
         create_or_update_product(self.user,data)
         self.assertEquals(self.product.code, "FCTA0041")
         self.assertEquals(len(self.product.items.all()), 1)
