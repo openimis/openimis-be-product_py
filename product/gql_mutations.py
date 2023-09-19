@@ -10,11 +10,10 @@ from django.core.exceptions import ValidationError, PermissionDenied
 from graphene.types.decimal import Decimal
 from location.models import Location
 from .services import (
-    set_product_items,
+    set_product_details,
     set_product_relative_distribution,
     set_product_deductible_and_ceiling,
     save_product_history,
-    set_product_services,
     check_unique_code_product
 )
 from .apps import ProductConfig
