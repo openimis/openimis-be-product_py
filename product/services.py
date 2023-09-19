@@ -124,10 +124,10 @@ def set_product_details(details_list, detail_model, hist_id, incoming, user):
     seen_uuids = []
     for item in incoming:
         uuid = item.pop("item_uuid")
-            if uuid in seen_uuids:
-                raise ValidationError(
-                    f"'{uuid}' is already linked to the product.")
-            seen_uuids.append(uuid)
+        if uuid in seen_uuids:
+            raise ValidationError(
+                f"'{uuid}' is already linked to the product.")
+        seen_uuids.append(uuid)
         details_list.create(
             item=DetailModel.objects.get(uuid=uuid),
             audit_user_id=user.id_for_audit,
