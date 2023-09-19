@@ -113,7 +113,7 @@ def get_clone(obj):
 
 def set_product_details(details_list, detail_model, hist_id, incoming, user):
     DetailModel = apps.get_model("medical", detail_model)
-    if not Item:
+    if not DetailModel:
         logger.warning(f"medical.{detail_model} does not exist.")
         return
     if incoming is None:
