@@ -3,6 +3,18 @@ from core.services import  create_or_update_interactive_user,create_or_update_co
 from product.test_helpers import create_test_product, create_test_product_service, create_test_product_item
 from medical.test_helpers import create_test_service, create_test_item
 
+_TEST_USER_NAME = "test_insuree_import"
+_TEST_USER_PWD = "test_insuree_import"
+_TEST_DATA_USER = {
+    "username": _TEST_USER_NAME,
+    "last_name": _TEST_USER_NAME,
+    "password": _TEST_USER_PWD,
+    "other_names": _TEST_USER_NAME,
+    "user_types": "INTERACTIVE",
+    "language": "en",
+    "roles": [1, 5, 9],
+}
+
 DATA_MUTATION={
     "query":"mutation ($input: UpdateProductMutationInput!) {updateProduct(input: $input) { internalId clientMutationId }}",
     "variables":{"input":{
