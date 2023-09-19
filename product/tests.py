@@ -34,6 +34,7 @@ DATA_MUTATION={
             "gracePeriodRenewal":0,
             "gracePeriodPayment":3,
             "accCodePremiums":"",
+            "services":[],
             "accCodeRemuneration":"",
             "maxPolicyExtraMember":null,
             "maxPolicyExtraMemberIp":null,
@@ -90,3 +91,5 @@ class HelpersTest(TestCase):
     def test_save_history(self):
         create_or_update_product(self.user,DATA_MUTATION['variables']['input'])
         self.assertEquals(self.product.code, "FCTA0001")
+        self.assertEquals(len(self.product.items), 1)
+        self.assertEquals(len(self.product.services), 0)
