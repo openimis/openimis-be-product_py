@@ -9,9 +9,10 @@ from django.core.exceptions import ValidationError
 logger = logging.getLogger(__name__)
 
 
-def save_product_history(product):
-    product.save_history()
+def save_product_history(product, items, services):
+    hist_id = product.save_history()
     product.relative_distributions.update(validity_to=TimeUtils.now())
+    return hist_id
 
 
 care_type_to_field = {
@@ -23,14 +24,14 @@ care_type_to_field = {
 periods_to_period_rel_prices = {1: "Y", 4: "Q", 12: "M"}
 
 
-def set_product_relative_distribution(user, product, relative_distributions):
+def set_product_relative_distribution(product, hist_id, relative_distributions,user):
     RelativeDistribution = apps.get_model(
         "claim_batch", "RelativeDistribution")
     if RelativeDistribution is None:
         logger.warning("RelativeDistribution does not exist.")
         return
-
-    product.relative_distributions.update(validity_to=TimeUtils.now())
+    if hist_id:
+        product.relative_distributions.update(validity_to=TimeUtils.now(),product_id=hist_id)
     product.period_rel_prices = None
     product.period_rel_prices_ip = None
     product.period_rel_prices_op = None
@@ -105,56 +106,33 @@ def set_product_deductible_and_ceiling(
         )
 
 
-def set_product_items(product, items, user):
-    Item = apps.get_model("medical", "Item")
+def get_clone(obj):
+    clone = obj.copy()
+    clone.pk = None
+    return clone
+
+def set_product_details(details_list, detail_model, hist_id, incoming, user):
+    DetailModel = apps.get_model("medical", detail_model)
     if not Item:
-        logger.warning("medical.Item does not exist.")
+        logger.warning(f"medical.{detail_model} does not exist.")
         return
-
+    if incoming is None:
+        incoming = [get_clone(detail) for detail in details_list]
+    if hist_id:    
+        details_list.update(validity_to=TimeUtils.now(), product_id=hist_id)
     # Ensure there no duplicates
     seen_uuids = []
-
-    last_legacy_id = Product.objects.filter().last().id
-    product.items.update(validity_to=TimeUtils.now(), product_id=last_legacy_id)
-    if items:
-        for item in items:
-            uuid = item.pop("item_uuid")
+    for item in incoming:
+        uuid = item.pop("item_uuid")
             if uuid in seen_uuids:
                 raise ValidationError(
                     f"'{uuid}' is already linked to the product.")
             seen_uuids.append(uuid)
-
-            product.items.create(
-                item=Item.objects.get(uuid=uuid),
-                audit_user_id=user.id_for_audit,
-                **item,
-            )
-
-
-def set_product_services(product, services, user):
-    Service = apps.get_model("medical", "Service")
-    if not Service:
-        logger.warning("medical.Service does not exist.")
-        return
-
-    # Ensure there no duplicates
-    seen_uuids = []
-
-    last_legacy_id = Product.objects.filter().last().id
-    product.services.update(validity_to=TimeUtils.now(), product_id=last_legacy_id)
-    if services:
-        for service in services:
-            uuid = service.pop("service_uuid")
-            if uuid in seen_uuids:
-                raise ValidationError(
-                    f"'{uuid}' is already linked to the product.")
-            seen_uuids.append(uuid)
-
-            product.services.create(
-                service=Service.objects.get(uuid=uuid),
-                audit_user_id=user.id_for_audit,
-                **service,
-            )
+        details_list.create(
+            item=DetailModel.objects.get(uuid=uuid),
+            audit_user_id=user.id_for_audit,
+            **item,
+        )
 
 
 def check_unique_code_product(code):
