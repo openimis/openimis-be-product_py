@@ -2,6 +2,7 @@ from django.test import TestCase
 from core.services import  create_or_update_interactive_user,create_or_update_core_user
 from product.test_helpers import create_test_product, create_test_product_service, create_test_product_item
 from medical.test_helpers import create_test_service, create_test_item
+from product.gql_mutations import create_or_update_product
 
 _TEST_USER_NAME = "test_insuree_import"
 _TEST_USER_PWD = "test_insuree_import"
@@ -100,11 +101,11 @@ class HelpersTest(TestCase):
     def test_helper(self):
 
         self.assertEquals(self.product.code, "ELI1")
-        self.assertEquals(len(self.product.items), 1)
-        self.assertEquals(len(self.product.services), 1)
+        self.assertEquals(self.product.items.all.count, 1)
+        self.assertEquals(self.product.services.all.count, 1)
 
     def test_save_history(self):
         create_or_update_product(self.user,DATA_MUTATION['variables']['input'])
         self.assertEquals(self.product.code, "FCTA0001")
-        self.assertEquals(len(self.product.items), 1)
-        self.assertEquals(len(self.product.services), 0)
+        self.assertEquals(self.product.items.all.count, 1)
+        self.assertEquals(self.product.services.all.count, 0)
