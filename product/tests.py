@@ -1,5 +1,5 @@
 from django.test import TestCase
-
+from core.services import   create_or_update_interactive_user,create_or_update_core_user,
 from product.test_helpers import create_test_product, create_test_product_service, create_test_product_item
 from medical.test_helpers import create_test_service, create_test_item
 
