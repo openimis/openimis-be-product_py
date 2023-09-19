@@ -91,7 +91,6 @@ class HelpersTest(TestCase):
             user_id=None, data=_TEST_DATA_USER, audit_user_id=999, connected=False)
         self.user, user_created = create_or_update_core_user(
             user_uuid=None, username=_TEST_DATA_USER["username"], i_user=i_user)
-        insuree, family = create_test_insuree_for_policy(with_family=True, is_head=False, custom_props={"chf_id": "paysimp"}, family_custom_props=None)
         self.product = create_test_product("ELI1",custom_props={"uuid": "eaa082a0-d71e-4526-a918-3239b098afa7"})
         service = create_test_service("V", custom_props={"code": "VVVV"})
         create_test_product_service(self.product, service, custom_props={"limit_no_adult": 20})
