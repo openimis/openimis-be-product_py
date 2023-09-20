@@ -127,7 +127,7 @@ def set_product_details(details_list, detail_model, hist_id, incoming, user):
             uuid = item.pop("item_uuid")
         else:
             #for converted object
-            uuid = item.pop(detail_model.lower())
+            uuid = item.pop(detail_model.lower()+"_id")
 
         if uuid in seen_uuids:
             raise ValidationError(
