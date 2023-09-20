@@ -122,7 +122,7 @@ def set_product_details(details_list, detail_model, hist_id, incoming, user):
     # Ensure there no duplicates
     seen_uuids = []
     for item in incoming:
-        if item_uuid:
+        if 'item_uuid' in item:
             #for mutation payload
             uuid = item.pop("item_uuid")
         else:
