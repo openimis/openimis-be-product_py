@@ -1,7 +1,8 @@
-from core import datetime
-from django.apps import apps
-from core.utils import TimeUtils
 import logging
+from django.apps import apps
+from core import datetime
+from core import filter_validity
+from core.utils import TimeUtils
 from .models import Product
 
 from django.core.exceptions import ValidationError
@@ -117,7 +118,7 @@ def set_product_details(details_list, detail_model, hist_id, incoming, user):
         logger.warning(f"medical.{detail_model} does not exist.")
         return
     if incoming is None:
-        incoming = [get_clone(detail) for detail in details_list]
+        incoming = [get_clone(detail) for detail in details_list.filter(*filter_validity())]
     if hist_id:    
         details_list.update(validity_to=TimeUtils.now(), product_id=hist_id)
     # Ensure there no duplicates
