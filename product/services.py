@@ -4,6 +4,7 @@ from core import datetime
 from core import filter_validity
 from core.utils import TimeUtils
 from .models import Product
+from model_clone.utils import create_copy_of_instance
 
 from django.core.exceptions import ValidationError
 
@@ -107,10 +108,7 @@ def set_product_deductible_and_ceiling(
         )
 
 
-def get_clone(obj):
-    clone = obj.copy()
-    clone.pk = None
-    return clone
+
 
 def set_product_details(details_list, detail_model, hist_id, incoming, user):
     DetailModel = apps.get_model("medical", detail_model)
@@ -118,7 +116,7 @@ def set_product_details(details_list, detail_model, hist_id, incoming, user):
         logger.warning(f"medical.{detail_model} does not exist.")
         return
     if incoming is None:
-        incoming = [get_clone(detail) for detail in details_list.filter(*filter_validity())]
+        incoming = [create_copy_of_instance(detail, attrs={pk:None}) for detail in details_list.filter(*filter_validity())]
     if hist_id:    
         details_list.update(validity_to=TimeUtils.now(), product_id=hist_id)
     # Ensure there no duplicates
