@@ -116,7 +116,7 @@ def set_product_details(details_list, detail_model, hist_id, incoming, user):
         logger.warning(f"medical.{detail_model} does not exist.")
         return
     if incoming is None:
-        incoming = [create_copy_of_instance(detail, attrs={'pk':None}) for detail in details_list.filter(*filter_validity())]
+        incoming = [create_copy_of_instance(detail, attrs={'pk':None}).__dict__ for detail in details_list.filter(*filter_validity())]
     if hist_id:    
         details_list.update(validity_to=TimeUtils.now(), product_id=hist_id)
     # Ensure there no duplicates
