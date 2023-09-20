@@ -122,7 +122,13 @@ def set_product_details(details_list, detail_model, hist_id, incoming, user):
     # Ensure there no duplicates
     seen_uuids = []
     for item in incoming:
-        uuid = item.pop("item_uuid")
+        if item_uuid:
+            #for mutation payload
+            uuid = item.pop("item_uuid")
+        else:
+            #for converted object
+            uuid = item.pop("uuid")
+
         if uuid in seen_uuids:
             raise ValidationError(
                 f"'{uuid}' is already linked to the product.")
