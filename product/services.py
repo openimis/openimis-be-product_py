@@ -115,32 +115,41 @@ def set_product_details(details_list, detail_model, hist_id, incoming, user):
     if not DetailModel:
         logger.warning(f"medical.{detail_model} does not exist.")
         return
+    copied = []
+    update_time=TimeUtils.now()
     if incoming is None:
-        incoming = [create_copy_of_instance(detail, attrs={'pk':None}).__dict__ for detail in details_list.filter(*filter_validity())]
+        #just save a new version of the items
+        for  detail in details_list.filter(*filter_validity()):
+            copied.append(create_copy_of_instance(detail, attrs={'pk':None, 'validity_from': update_time }))
+            
+    #update the old items/services
     if hist_id:    
-        details_list.update(validity_to=TimeUtils.now(), product_id=hist_id)
-    # Ensure there no duplicates
-    seen_uuids = []
-    for item in incoming:
-        item_id= None
-        if 'item_uuid' in item:
-            #for mutation payload
-            uuid = item.pop("item_uuid")
-            item['audit_user_id']=user.id_for_audit
-        else:
-            #for converted object
-            item_id = item.pop(detail_model.lower()+"_id")
-            uuid=item_id
+        details_list.update(validity_to=update_time, product_id=hist_id)
+    #save the copied after making the update
+    for cpd in copied:
+        cpd.save()
+    if incoming is not  None:
+        # Ensure there no duplicates
+        seen_uuids = []
+        for item in incoming:
+            item_id= None
+            if 'item_uuid' in item:
+                #for mutation payload
+                uuid = item.pop("item_uuid")
+                item['audit_user_id']=user.id_for_audit
+                item['validity_from']=update_time
 
-        if uuid in seen_uuids:
-            raise ValidationError(
-                f"'{uuid}' is already linked to the product.")
-        seen_uuids.append(uuid)
-        
-        details_list.create(
-            item=DetailModel.objects.get(id=item_id) if id is not None else DetailModel.objects.get(uuid=uuid),
-            **item,
-        )
+            if uuid in seen_uuids:
+                raise ValidationError(
+                    f"'{uuid}' is already linked to the product.")
+            seen_uuids.append(uuid)
+            
+            details_list.create(
+                item=DetailModel.objects.get(id=item_id) if id is not None else DetailModel.objects.get(uuid=uuid),
+                **item,
+                
+            )
+ 
 
 
 def check_unique_code_product(code):
