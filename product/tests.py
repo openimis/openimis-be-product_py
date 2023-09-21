@@ -42,7 +42,7 @@ DATA_MUTATION={
             "renewalDiscountPeriod":None,
             "enrolmentDiscountPerc":None,
             "enrolmentDiscountPeriod":None,
-            "ceilingInterpretation":"CLAIM_TYPE",
+            "ceilingInterpretation":"I",
             "gracePeriodEnrolment":0,
             "gracePeriodRenewal":0,
             "gracePeriodPayment":3,

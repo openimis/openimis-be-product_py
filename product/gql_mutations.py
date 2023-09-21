@@ -136,7 +136,7 @@ def create_or_update_product(user, data, is_duplicate=False):
         product.conversion_product = Product.objects.get(
             uuid=conversion_product_uuid)
     set_product_details(product.items, 'Item', hist_id, items, user) 
-    set_product_details(product.services,'Item', hist_id, services, user) 
+    set_product_details(product.services,'Service', hist_id, services, user) 
     set_product_relative_distribution(product, hist_id, relative_prices,user)
 
     set_product_deductible_and_ceiling(
@@ -400,8 +400,8 @@ class DuplicateProductMutation(OpenIMISMutation):
 
         data["audit_user_id"] = user.id_for_audit
 
-        duplicate_items = True if 'items' not in data else False
-        duplicate_services = True if 'services' not in data else False
+        duplicate_items = True #if 'items' not in data else False
+        duplicate_services = True #if 'services' not in data else False
 
         new_product = create_or_update_product(user, data, is_duplicate=True)
 
