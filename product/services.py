@@ -132,22 +132,20 @@ def set_product_details(details_list, detail_model, hist_id, incoming, user):
         # Ensure there no duplicates
         seen_uuids = []
         for item in incoming:
-            item_id= None
-            if 'item_uuid' in item:
                 #for mutation payload
-                uuid = item.pop("item_uuid")
-                item['audit_user_id']=user.id_for_audit
-                item['validity_from']=update_time
+            uuid = item.pop(f"{detail_model.lower()}_uuid", None)
+            item_id = item.pop(f"{detail_model.lower()}_id", None)
+            item['audit_user_id']=user.id_for_audit
+            item['validity_from']=update_time
 
-            if uuid in seen_uuids:
+            if item_id in seen_uuids or  uuid in seen_uuids:
                 raise ValidationError(
                     f"'{uuid}' is already linked to the product.")
-            seen_uuids.append(uuid)
             
+            seen_uuids.append(uuid or item_id)
+            item[detail_model.lower()]=DetailModel.objects.get(id=item_id) if item_id is not None else DetailModel.objects.get(uuid=uuid)
             details_list.create(
-                item=DetailModel.objects.get(id=item_id) if id is not None else DetailModel.objects.get(uuid=uuid),
                 **item,
-                
             )
  
 
