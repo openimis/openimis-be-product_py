@@ -21,6 +21,7 @@ setup(
     install_requires=[
         'django',
         'django-db-signals',
+        'django-clone',
         'djangorestframework',
     ],   
     classifiers=[
