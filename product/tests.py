@@ -217,7 +217,7 @@ class HelpersTest(TestCase):
         self.assertEquals(len(self.product.services.all()), 1)
 
     def test_save_history(self):
-        pattern = re.compile(r'(?<!^)(?=[A-Z]|[0-9]+)')
+        pattern = re.compile(r'(?<=[a-z0-9])(?=[A-Z])')
         data={pattern.sub('_', key).lower(): DATA_MUTATION['variables']['input'][key] for key in DATA_MUTATION['variables']['input']}
         create_or_update_product(self.user,data)
         self.product=Product.objects.filter(uuid = 'eaa082a0-d71e-4526-a918-3239b098afa7').first()
