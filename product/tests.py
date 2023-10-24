@@ -236,7 +236,6 @@ class HelpersTest(TestCase):
         
     def to_camel_case_key(self, input):
         pattern = re.compile(r'(?<!^)(?=[A-Z]|[0-9]+)')
-
         if isinstance(input, list):
             res = []
             for elm in input:
