@@ -235,7 +235,8 @@ class HelpersTest(TestCase):
         self.assertEquals(len(self.product.services.all()), 1)
         
     def to_camel_case_key(self, input):
-        pattern = re.compile(r'(?<=[a-z0-9])(?=[A-Z])')
+        pattern = re.compile(r'(?<!^)(?=[A-Z]|[0-9]+)')
+
         if isinstance(input, list):
             res = []
             for elm in input:
