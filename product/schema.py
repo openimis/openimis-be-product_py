@@ -337,6 +337,7 @@ class Query(graphene.ObjectType):
 
         # Consider only the locations user is configured for
         from location.models import Location
+        from location.schema import LocationManager
         qs = LocationManager().build_user_location_filter_query(info.context.user._u, queryset = qs)
 
         return gql_optimizer.query(qs, info)
