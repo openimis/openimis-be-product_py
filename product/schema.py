@@ -178,7 +178,6 @@ class ProductGQLType(DjangoObjectType):
             "weight_adjusted_amount",
             "product_set",
             "relativeindex_set",
-            "contributionplan_set",
             "period_rel_prices",
             "period_rel_prices_ip",
             "period_rel_prices_op",
@@ -242,7 +241,7 @@ class ProductItemGQLType(DjangoObjectType):
 
     @classmethod
     def get_queryset(cls, queryset, info):
-        return queryset.filter(validity_to=None)
+        return queryset.filter()
 
     class Meta:
         model = ProductItem
@@ -263,7 +262,7 @@ class ProductServiceGQLType(DjangoObjectType):
 
     @classmethod
     def get_queryset(cls, queryset, info):
-        return queryset.filter(validity_to=None)
+        return queryset.filter()
 
     class Meta:
         model = ProductService
@@ -338,8 +337,8 @@ class Query(graphene.ObjectType):
 
         # Consider only the locations user is configured for
         from location.models import Location
-        qs = qs.filter(Location.build_user_location_filter_query(
-            info.context.user._u))
+        from location.schema import LocationManager
+        qs = LocationManager().build_user_location_filter_query(info.context.user._u, queryset = qs)
 
         return gql_optimizer.query(qs, info)
 
