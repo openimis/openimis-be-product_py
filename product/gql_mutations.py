@@ -328,6 +328,8 @@ class ProductInputType(OpenIMISMutation.Input):
     relative_prices = graphene.List(RelativePricesInput)
     items = graphene.List(graphene.NonNull(ProductItemInput))
     services = graphene.List(graphene.NonNull(ProductServiceInput))
+    age_minimal = graphene.Int()
+    age_maximal = graphene.Int()
 
 
 class CreateProductMutation(CreateOrUpdateProductMutation):
