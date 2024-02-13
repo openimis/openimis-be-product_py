@@ -402,6 +402,12 @@ class Product(VersionedModel):
         blank=True,
         null=True,
     )
+    age_minimal = models.IntegerField(
+        db_column="Min Age", blank=True, null=True
+    )
+    age_maximal = models.IntegerField(
+        db_column="Max Age", blank=True, null=True
+    )
 
     def has_cycle(self):
         return (
