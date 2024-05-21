@@ -6,7 +6,7 @@ from product.gql_mutations import create_or_update_product
 from product.models import Product
 import re
 _TEST_USER_NAME = "test_insuree_import"
-_TEST_USER_PWD = "test_insuree_import"
+_TEST_USER_PWD = "Test_insuree_import_1"
 _TEST_DATA_USER = {
     "username": _TEST_USER_NAME,
     "last_name": _TEST_USER_NAME,
