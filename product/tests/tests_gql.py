@@ -8,6 +8,8 @@ from product.models import Product
 from core.models import TechnicalUser
 from core.models.openimis_graphql_test_case import openIMISGraphQLTestCase, BaseTestContext
 from core.test_helpers import create_test_interactive_user
+from location.test_helpers import create_test_location
+from product.test_helpers import create_test_product
 from policyholder.tests.helpers import *
 from contribution_plan.tests.helpers import create_test_contribution_plan, \
     create_test_contribution_plan_bundle, create_test_contribution_plan_bundle_details
@@ -32,12 +34,13 @@ class MutationTestProduct(openIMISGraphQLTestCase):
         user = mock.Mock(is_anonymous=True)
 
     @classmethod
-    def setUpClass(cls):
-        cls.user = create_test_interactive_user(username='admin', password='S\/pe®Pąßw0rd™')
-        super(MutationTestProduct, cls).setUpClass()
+    def setUp(self):
+        self.user = create_test_interactive_user(username='ProductAdmin')
+        super().setUp(self)
         # some test data so as to created contract properly
-        cls.user_token = BaseTestContext(user=cls.user).get_jwt()
-        cls.product = Product.objects.filter(code='BCTA0001').first()
+        self.user_context = BaseTestContext(user=self.user)
+        location = create_test_location("D")
+        self.product = create_test_product("BCTA0001", custom_props={"location": location})
     def test_mutation_update_product(self):
         time_stamp = datetime.datetime.now()
         mutation_raw = """
@@ -111,5 +114,4 @@ class MutationTestProduct(openIMISGraphQLTestCase):
             "clientMutationId": "a15498d1-bc77-4516-99d6-23d5d2023d96"
           }}
         }}"""
-        content=self.send_mutation_raw(mutation_raw,  self.user_token, variables_param)
-        
+        content=self.send_mutation_raw(mutation_raw,  self.user_context.get_jwt(), variables_param)
