@@ -33,10 +33,9 @@ class MutationTestProduct(openIMISGraphQLTestCase):
     class AnonymousUserContext:
         user = mock.Mock(is_anonymous=True)
 
-    @classmethod
     def setUp(self):
+        super(MutationTestProduct, self).setUp()
         self.user = create_test_interactive_user(username='ProductAdmin')
-        super().setUp(self)
         # some test data so as to created contract properly
         self.user_context = BaseTestContext(user=self.user)
         location = create_test_location("D")
