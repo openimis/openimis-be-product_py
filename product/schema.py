@@ -319,7 +319,7 @@ class Query(graphene.ObjectType):
 
         qs = Product.objects
         if not show_history:
-            qs = qs.filter(*filter_validity(**kwargs))
+            qs = qs.filter(*Product.filter_validity(**kwargs))
 
         if search is not None:
             qs = qs.filter(Q(name__icontains=search) |
