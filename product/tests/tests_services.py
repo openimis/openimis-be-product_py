@@ -1,5 +1,5 @@
 from django.test import TestCase
-from core.services import  create_or_update_interactive_user,create_or_update_core_user
+from core.test_helpers import create_test_interactive_user, create_admin_role
 from product.test_helpers import create_test_product, create_test_product_service, create_test_product_item
 from medical.test_helpers import create_test_service, create_test_item
 from product.gql_mutations import create_or_update_product
@@ -8,13 +8,12 @@ import re
 _TEST_USER_NAME = "test_insuree_import"
 _TEST_USER_PWD = "Test_insuree_import_1"
 _TEST_DATA_USER = {
-    "username": _TEST_USER_NAME,
     "last_name": _TEST_USER_NAME,
     "password": _TEST_USER_PWD,
     "other_names": _TEST_USER_NAME,
     "user_types": "INTERACTIVE",
     "language": "en",
-    "roles": [1, 5, 9],
+    "roles": [create_admin_role().id],
 }
 
 null = None
@@ -200,10 +199,7 @@ class HelpersTest(TestCase):
     user=None
     def setUp(self) -> None:
         super(HelpersTest, self).setUp()
-        i_user, i_user_created = create_or_update_interactive_user(
-            user_id=None, data=_TEST_DATA_USER, audit_user_id=999, connected=False)
-        self.user, user_created = create_or_update_core_user(
-            user_uuid=None, username=_TEST_DATA_USER["username"], i_user=i_user)
+        self.user = create_test_interactive_user(username=_TEST_USER_NAME, custom_props=_TEST_DATA_USER)      
         self.product = create_test_product("ELI1",custom_props={"uuid": "eaa082a0-d71e-4526-a918-3239b098afa7"})
         service = create_test_service("V", custom_props={"code": "VVVV", 'uuid':"488d8bcb-5b88-438c-9077-f177f6f32625"})
         create_test_product_service(self.product, service, custom_props={"limit_no_adult": 20})

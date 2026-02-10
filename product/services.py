@@ -119,7 +119,7 @@ def set_product_details(details_list, detail_model, hist_id, incoming, user):
     update_time=TimeUtils.now()
     if incoming is None:
         #just save a new version of the items
-        for  detail in details_list.filter(*filter_validity()):
+        for  detail in details_list.filter(*DetailModel.filter_validity()):
             copied.append(create_copy_of_instance(detail, attrs={'pk':None, 'validity_from': update_time }))
             
     #update the old items/services
