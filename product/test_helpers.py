@@ -1,5 +1,4 @@
 from product.models import Product, ProductService, ProductItem
-from program.test_helpers import create_test_program
 
 def create_test_product(code=None, valid=True, custom_props=None):
     if custom_props is None:
@@ -16,7 +15,6 @@ def create_test_product(code=None, valid=True, custom_props=None):
     if not product and 'id' in custom_props:
         product = Product.objects.filter(id=custom_props['id'],).first()
     if not product:
-        program = create_test_program(code="STPHP", name="Swiss TPH Program")
         product = Product.objects.create(
             **{
                 "code": code,
@@ -30,7 +28,6 @@ def create_test_product(code=None, valid=True, custom_props=None):
                 "validity_from": "2019-01-01",
                 "validity_to": None if valid else "2019-01-01",
                 "audit_user_id": -1,
-                "program": program,
                 **custom_props
             }
         )

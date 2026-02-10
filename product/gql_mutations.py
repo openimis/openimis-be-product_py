@@ -234,7 +234,7 @@ class ProductInputType(OpenIMISMutation.Input):
     max_installments = graphene.Int()
     recurrence = graphene.Int()
     location_uuid = graphene.UUID()
-    program = graphene.Int(required=True)
+    program = graphene.Int(required=False)
     conversion_product_uuid = graphene.UUID()
     acc_code_remuneration = graphene.String()
     acc_code_premiums = graphene.String()
