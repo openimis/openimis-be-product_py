@@ -1,5 +1,6 @@
 from product.models import Product, ProductService, ProductItem
 
+
 def create_test_product(code=None, valid=True, custom_props=None):
     if custom_props is None:
         custom_props = {}
