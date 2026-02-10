@@ -29,6 +29,9 @@ from .enums import (
     LimitTypeEnum,
     PriceOriginEnum,
 )
+import datetime
+from program import models as program_models
+from core.apps import CoreConfig
 
 
 class ProductRelativePricesGQLType(graphene.ObjectType):
@@ -334,6 +337,15 @@ class Query(graphene.ObjectType):
                 | Q(location__isnull=True)
 
             )
+        user_id = info.context.user._u.id
+        today = datetime.datetime.now()
+        programs = program_models.Program.objects.filter(user__id=user_id).filter(
+                validityDateFrom__lte=today
+            ).filter(
+                Q(validityDateTo__isnull=True) | Q(validityDateTo__gte=today)
+                )
+        if CoreConfig.is_program_available:
+            qs = qs.filter(program_id__in=programs)
 
         # Consider only the locations user is configured for
         from location.models import Location

@@ -2,7 +2,7 @@ import datetime
 from gettext import gettext as _
 from operator import or_
 from dataclasses import dataclass
-
+from core.apps import CoreConfig
 import graphene
 from core.schema import OpenIMISMutation
 from django.contrib.auth.models import AnonymousUser
@@ -26,6 +26,7 @@ from .enums import (
     LimitTypeEnum,
     PriceOriginEnum,
 )
+from program import models as program_models
 
 
 @dataclass
@@ -66,6 +67,10 @@ def create_or_update_product(user, data, is_duplicate=False):
     items = data.pop("items", None)
     services = data.pop("services", None)
     ceiling_type = data.get("ceiling_type", None)
+    if CoreConfig.is_program_available:
+        data["program"] = program_models.Program.objects.filter(idProgram=data["program"]).first()
+    else:
+        data.pop("program", None)
     deductibles = extract_deductibles(data)
     ceilings = extract_ceilings(data)
     hist_id=None
@@ -229,6 +234,7 @@ class ProductInputType(OpenIMISMutation.Input):
     max_installments = graphene.Int()
     recurrence = graphene.Int()
     location_uuid = graphene.UUID()
+    program = graphene.Int(required=True)
     conversion_product_uuid = graphene.UUID()
     acc_code_remuneration = graphene.String()
     acc_code_premiums = graphene.String()
