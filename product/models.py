@@ -3,7 +3,7 @@ from django.db.models.deletion import CASCADE
 from django.utils.translation import gettext_lazy
 from django.db import models
 from core.models import VersionedModel, ObjectMutation, UUIDModel, MutationLog
-
+from program import models as program_models
 
 class Product(VersionedModel):
     id = models.AutoField(db_column="ProdID", primary_key=True)
@@ -401,6 +401,14 @@ class Product(VersionedModel):
         decimal_places=2,
         blank=True,
         null=True,
+    )
+    program = models.ForeignKey(
+        program_models.Program,
+        models.DO_NOTHING,
+        db_column='program',
+        related_name="product_program",
+        null=True,
+        blank=True
     )
     age_minimal = models.IntegerField(
         db_column="Min Age", blank=True, null=True
