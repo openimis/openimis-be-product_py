@@ -29,6 +29,7 @@ from .enums import (
     LimitTypeEnum,
     PriceOriginEnum,
 )
+from core.gql import ScopedQuerysetMixin
 
 
 class ProductRelativePricesGQLType(graphene.ObjectType):
@@ -48,7 +49,7 @@ def period_type_to_number(period_type):
         return None
 
 
-class ProductGQLType(DjangoObjectType):
+class ProductGQLType(ScopedQuerysetMixin, DjangoObjectType):
     ceiling_interpretation = graphene.Field(CeilingInterpretationEnum)
     relative_prices = graphene.NonNull(
         graphene.List(ProductRelativePricesGQLType))
