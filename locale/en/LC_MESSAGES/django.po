@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-06-05 10:49+0200\n"
+"POT-Creation-Date: 2026-09-17 16:48+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -17,6 +17,80 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: product/schema.py:59 product/schema.py:64
+#: product/gql_mutations.py:78
+msgid "mutation.product_code_duplicated"
+msgstr ""
+
+#: product/gql_mutations.py:174 product/gql_mutations.py:404
+msgid "mutation.authentication_required"
+msgstr ""
+
+#: product/gql_mutations.py:176 product/gql_mutations.py:406
+#: product/gql_mutations.py:473 product/schema.py:302 product/schema.py:307
+#: product/schema.py:319 product/schema.py:348
 msgid "unauthorized"
 msgstr "User not authorized for this operation"
+
+#: product/gql_mutations.py:365
+msgid "product.mutation.failed_to_create_product"
+msgstr ""
+
+#: product/gql_mutations.py:396
+msgid "product.mutation.failed_to_duplicate_product"
+msgstr ""
+
+#: product/gql_mutations.py:456
+msgid "product.mutation.failed_to_update_product"
+msgstr ""
+
+#: product/gql_mutations.py:484
+msgid "product.validation.id_does_not_exist"
+msgstr ""
+
+#: product/gql_mutations.py:500
+msgid "product.mutation.failed_to_delete_product"
+msgstr ""
+
+#: product/models.py:303
+msgid "INSUREE"
+msgstr ""
+
+#: product/models.py:304
+msgid "TREATMENT"
+msgstr ""
+
+#: product/models.py:305
+msgid "POLICY"
+msgstr ""
+
+#: product/models.py:318
+msgid "Claim Type"
+msgstr ""
+
+#: product/models.py:319
+msgid "Health Facility Type"
+msgstr ""
+
+#: product/models.py:474
+msgid "Fixed"
+msgstr ""
+
+#: product/models.py:474
+msgid "Co-insurance"
+msgstr ""
+
+#: product/models.py:494 product/models.py:590
+msgid "Schema Price"
+msgstr ""
+
+#: product/models.py:495 product/models.py:591
+msgid "Providers Own Price"
+msgstr ""
+
+#: product/models.py:496 product/models.py:592
+msgid "Relative Price"
+msgstr ""
+
+#: product/schema.py:283
+msgid "Search in `name` & `code`"
+msgstr ""

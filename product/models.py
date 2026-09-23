@@ -3,9 +3,12 @@ from django.db.models.deletion import CASCADE
 from django.utils.translation import gettext_lazy
 from django.db import models
 from core.models import VersionedModel, ObjectMutation, UUIDModel, MutationLog
+from core.models import LocationScope
 
 
 class Product(VersionedModel):
+    row_scope = LocationScope("location")
+
     id = models.AutoField(db_column="ProdID", primary_key=True)
     uuid = models.CharField(
         db_column="ProdUUID", max_length=36, default=uuid.uuid4, unique=True
