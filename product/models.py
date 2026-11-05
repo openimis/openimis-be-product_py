@@ -7,6 +7,9 @@ from core.models import LocationScope
 
 
 class Product(VersionedModel):
+    # Versions carry a business meaning: a validity date picks the one valid then.
+    business_versioned = True
+
     row_scope = LocationScope("location")
 
     id = models.AutoField(db_column="ProdID", primary_key=True)
@@ -475,6 +478,9 @@ LIMIT_CHOICES = (("F", gettext_lazy("Fixed")), ("C", gettext_lazy("Co-insurance"
 
 
 class ProductItem(VersionedModel, ProductItemOrService):
+    # Versions carry a business meaning: a validity date picks the one valid then.
+    business_versioned = True
+
     id = models.AutoField(db_column="ProdItemID", primary_key=True)
     product = models.ForeignKey(
         Product, db_column="ProdID", on_delete=models.DO_NOTHING, related_name="items"
@@ -570,6 +576,9 @@ class ProductItem(VersionedModel, ProductItemOrService):
 
 
 class ProductService(VersionedModel, ProductItemOrService):
+    # Versions carry a business meaning: a validity date picks the one valid then.
+    business_versioned = True
+
     id = models.AutoField(db_column="ProdServiceID", primary_key=True)
     product = models.ForeignKey(
         Product,
