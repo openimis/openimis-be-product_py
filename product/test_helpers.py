@@ -5,11 +5,11 @@ def create_test_product(code=None, valid=True, custom_props=None):
     if custom_props is None:
         custom_props = {}
     else:
-        custom_props = {k: v for k, v in custom_props.items() if hasattr(Product, k)} 
+        custom_props = {k: v for k, v in custom_props.items() if hasattr(Product, k)}
     if 'code' in custom_props:
         code = custom_props.pop('code')
     elif not code:
-        code = 'TST-HPD'        
+        code = 'TST-HPD'
     product = Product.objects.filter(code=code, validity_to__isnull=valid).first()
     if not product and 'uuid' in custom_props:
         product = Product.objects.filter(uuid=custom_props['uuid'],).first()
@@ -42,7 +42,7 @@ def create_test_product_service(product, service, valid=True, custom_props=None)
     if custom_props is None:
         custom_props = {}
     else:
-        custom_props = {k: v for k, v in custom_props.items() if hasattr(ProductService, k)} 
+        custom_props = {k: v for k, v in custom_props.items() if hasattr(ProductService, k)}
     obj = ProductService.objects.filter(
         product=product,
         service=service,
@@ -80,7 +80,7 @@ def create_test_product_item(product, item, valid=True, custom_props=None):
     if custom_props is None:
         custom_props = {}
     else:
-        custom_props = {k: v for k, v in custom_props.items() if hasattr(ProductItem, k)} 
+        custom_props = {k: v for k, v in custom_props.items() if hasattr(ProductItem, k)}
     obj = ProductItem.objects.filter(
         product=product,
         item=item,
