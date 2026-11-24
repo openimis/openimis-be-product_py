@@ -1,7 +1,5 @@
 import logging
 from django.apps import apps
-from core import datetime
-from core import filter_validity
 from core.utils import TimeUtils
 from .models import Product
 from model_clone.utils import create_copy_of_instance
@@ -26,14 +24,14 @@ care_type_to_field = {
 periods_to_period_rel_prices = {1: "Y", 4: "Q", 12: "M"}
 
 
-def set_product_relative_distribution(product, hist_id, relative_distributions,user):
+def set_product_relative_distribution(product, hist_id, relative_distributions, user):
     RelativeDistribution = apps.get_model(
         "claim_batch", "RelativeDistribution")
     if RelativeDistribution is None:
         logger.warning("RelativeDistribution does not exist.")
         return
     if hist_id:
-        product.relative_distributions.update(validity_to=TimeUtils.now(),product_id=hist_id)
+        product.relative_distributions.update(validity_to=TimeUtils.now(), product_id=hist_id)
     product.period_rel_prices = None
     product.period_rel_prices_ip = None
     product.period_rel_prices_op = None
@@ -108,46 +106,43 @@ def set_product_deductible_and_ceiling(
         )
 
 
-
-
 def set_product_details(details_list, detail_model, hist_id, incoming, user):
     DetailModel = apps.get_model("medical", detail_model)
     if not DetailModel:
         logger.warning(f"medical.{detail_model} does not exist.")
         return
     copied = []
-    update_time=TimeUtils.now()
+    update_time = TimeUtils.now()
     if incoming is None:
-        #just save a new version of the items
-        for  detail in details_list.filter(*DetailModel.filter_validity()):
-            copied.append(create_copy_of_instance(detail, attrs={'pk':None, 'validity_from': update_time }))
-            
-    #update the old items/services
-    if hist_id:    
+        # just save a new version of the items
+        for detail in details_list.filter(*DetailModel.filter_validity()):
+            copied.append(create_copy_of_instance(detail, attrs={'pk': None, 'validity_from': update_time}))
+
+    # update the old items/services
+    if hist_id:
         details_list.update(validity_to=update_time, product_id=hist_id)
-    #save the copied after making the update
+    # save the copied after making the update
     for cpd in copied:
         cpd.save()
-    if incoming is not  None:
+    if incoming is not None:
         # Ensure there no duplicates
         seen_uuids = []
         for item in incoming:
-                #for mutation payload
+            # for mutation payload
             uuid = item.pop(f"{detail_model.lower()}_uuid", None)
             item_id = item.pop(f"{detail_model.lower()}_id", None)
-            item['audit_user_id']=user.id_for_audit
-            item['validity_from']=update_time
+            item['audit_user_id'] = user.id_for_audit
+            item['validity_from'] = update_time
 
-            if item_id in seen_uuids or  uuid in seen_uuids:
+            if item_id in seen_uuids or uuid in seen_uuids:
                 raise ValidationError(
                     f"'{uuid}' is already linked to the product.")
-            
+
             seen_uuids.append(uuid or item_id)
-            item[detail_model.lower()]=DetailModel.objects.get(id=item_id) if item_id is not None else DetailModel.objects.get(uuid=uuid)
+            item[detail_model.lower()] = DetailModel.objects.get(id=item_id) if item_id is not None else DetailModel.objects.get(uuid=uuid)
             details_list.create(
                 **item,
             )
- 
 
 
 def check_unique_code_product(code):

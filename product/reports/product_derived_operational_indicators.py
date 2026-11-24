@@ -3623,18 +3623,18 @@ def fetch_premium_data(search_filters: Q, start_month: AdDate, end_month: AdDate
                 premium["greatest_date_pay_start"], expiry_date)
             denominator = date_difference_or_1(
                 greatest_date_pay_effective, expiry_date)
-            total += multiplicator * (amount/denominator)
+            total += multiplicator * (amount / denominator)
         elif start_month <= greatest_date_pay_effective <= end_month:
             multiplicator = end_month.day + 1 - greatest_date_pay_effective.day
             denominator = date_difference_or_1(
                 greatest_date_pay_effective, expiry_date)
-            total += multiplicator * (amount/denominator)
+            total += multiplicator * (amount / denominator)
         elif expiry_date > end_month and premium["effective_date"] < start_month and premium["pay_date"] < start_month:
             multiplicator = end_month.day
             expiry_date_minus_1_day = expiry_date - timedelta(days=1)
             denominator = date_difference_or_1(
                 greatest_date_pay_effective, expiry_date_minus_1_day)
-            total += multiplicator * (amount/denominator)
+            total += multiplicator * (amount / denominator)
 
     return {
         DATA_ALLOCATED: total,
@@ -3729,7 +3729,7 @@ def product_derived_operational_indicators_query(user,
                                                  requested_product_id=DEFAULT_PRODUCT,
                                                  **kwargs):
     """
-    /!\ There are a lot of differences between the documentation on readthedocs and the actual report (if you manage to generate one).
+    /!\\ There are a lot of differences between the documentation on readthedocs and the actual report (if you manage to generate one).
     So, some decisions had to be made:
     - In the legacy version, 2 stored procedures were called uspSSRSDerivedIndicators1 and uspSSRSDerivedIndicators2.
     They handled data that looked similar but was different in many places. Merging the results of these two stored

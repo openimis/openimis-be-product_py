@@ -6,7 +6,6 @@ from decimal import Decimal
 MODULE_NAME = "product"
 
 
-
 # Rights, by entity then by action. `duplicate` has its own identifier: duplicating a
 # product is an action distinct from creating one in the openIMIS catalogue.
 DJANGO_PERMS = {
@@ -76,7 +75,6 @@ class ProductConfig(AppConfig):
 
         cfg = ModuleConfiguration.get_or_default(MODULE_NAME, DEFAULT_CFG)
         self.__load_config(cfg)
-
 
     def set_dataloaders(self, dataloaders):
         from .dataloaders import ProductLoader

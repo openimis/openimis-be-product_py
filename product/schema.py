@@ -1,7 +1,6 @@
-import json
 
 from django.core.exceptions import PermissionDenied
-from core import ExtendedConnection, prefix_filterset
+from core import ExtendedConnection
 from django.db.models import Q
 import graphene
 from graphene.relay import Node
@@ -20,7 +19,6 @@ from .gql_mutations import (
 )
 from .apps import ProductConfig
 from django.utils.translation import gettext as _
-from core import filter_validity
 from .enums import (
     CareTypeEnum,
     CeilingExclusionEnum,
@@ -223,8 +221,10 @@ class ProductItemOrServiceDefaultValuesGQLType(graphene.ObjectType):
 
     def resolve_default_price_origin(self, info):
         return ProductConfig.default_price_origin
+
     def resolve_default_limit(self, info):
         return ProductConfig.default_limit
+
     def resolve_default_limit_co_insurance_value(self, info):
         return ProductConfig.default_limit_co_insurance_value
 
@@ -323,8 +323,8 @@ class Query(graphene.ObjectType):
             qs = qs.filter(*Product.filter_validity(**kwargs))
 
         if search is not None:
-            qs = qs.filter(Q(name__icontains=search) |
-                           Q(code__icontains=search))
+            qs = qs.filter(Q(name__icontains=search)
+                           | Q(code__icontains=search))
 
         if location is not None:
             from location.models import Location
@@ -339,7 +339,7 @@ class Query(graphene.ObjectType):
         # Consider only the locations user is configured for
         from location.models import Location
         from location.schema import LocationManager
-        qs = LocationManager().build_user_location_filter_query(info.context.user._u, queryset = qs)
+        qs = LocationManager().build_user_location_filter_query(info.context.user._u, queryset=qs)
 
         return gql_optimizer.query(qs, info)
 
