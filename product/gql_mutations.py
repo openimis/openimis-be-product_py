@@ -1,4 +1,5 @@
 import datetime
+import decimal
 from gettext import gettext as _
 from dataclasses import dataclass
 
@@ -25,6 +26,9 @@ from .enums import (
     LimitTypeEnum,
     PriceOriginEnum,
 )
+
+# graphene 3 serialises Decimal defaults and refuses a plain int.
+ZERO = decimal.Decimal("0")
 
 
 @dataclass
@@ -189,22 +193,22 @@ class ProductServiceOrItemInput(graphene.InputObjectType):
     limit_no_adult = graphene.Int()
     limit_no_child = graphene.Int()
     limit_adult = graphene.Decimal(
-        max_digits=18, decimal_places=2, required=False, default_value=0
+        max_digits=18, decimal_places=2, required=False, default_value=ZERO
     )
     limit_child = graphene.Decimal(
-        max_digits=18, decimal_places=2, required=False, default_value=0
+        max_digits=18, decimal_places=2, required=False, default_value=ZERO
     )
     limit_adult_r = graphene.Decimal(
-        max_digits=18, decimal_places=2, required=False, default_value=0
+        max_digits=18, decimal_places=2, required=False, default_value=ZERO
     )
     limit_child_r = graphene.Decimal(
-        max_digits=18, decimal_places=2, required=False, default_value=0
+        max_digits=18, decimal_places=2, required=False, default_value=ZERO
     )
     limit_adult_e = graphene.Decimal(
-        max_digits=18, decimal_places=2, required=False, default_value=0
+        max_digits=18, decimal_places=2, required=False, default_value=ZERO
     )
     limit_child_e = graphene.Decimal(
-        max_digits=18, decimal_places=2, required=False, default_value=0
+        max_digits=18, decimal_places=2, required=False, default_value=ZERO
     )
     ceiling_exclusion_adult = graphene.Field(CeilingExclusionEnum)
     ceiling_exclusion_child = graphene.Field(CeilingExclusionEnum)
@@ -233,13 +237,13 @@ class ProductInputType(OpenIMISMutation.Input):
     acc_code_premiums = graphene.String()
 
     lump_sum = graphene.Decimal(
-        max_digits=18, decimal_places=2, required=False, default_value=0
+        max_digits=18, decimal_places=2, required=False, default_value=ZERO
     )
     premium_adult = graphene.Decimal(
-        max_digits=18, decimal_places=2, required=False, default_value=0
+        max_digits=18, decimal_places=2, required=False, default_value=ZERO
     )
     premium_child = graphene.Decimal(
-        max_digits=18, decimal_places=2, required=False, default_value=0
+        max_digits=18, decimal_places=2, required=False, default_value=ZERO
     )
     threshold = graphene.Int()
     share_contribution = graphene.Decimal(

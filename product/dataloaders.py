@@ -1,5 +1,4 @@
-from promise.dataloader import DataLoader
-from promise import Promise
+from core.dataloaders import DataLoader
 
 from .models import Product
 
@@ -9,4 +8,4 @@ class ProductLoader(DataLoader):
         products = {
             product.id: product for product in Product.objects.filter(id__in=keys)
         }
-        return Promise.resolve([products.get(product_id) for product_id in keys])
+        return [products.get(product_id) for product_id in keys]
